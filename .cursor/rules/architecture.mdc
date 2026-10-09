@@ -1,0 +1,60 @@
+---
+description: Architecture and conventions for Hazel's portfolio site. Read before any change.
+alwaysApply: true
+---
+
+# Project: Hazel's portfolio site
+
+A personal site with two sections reachable from the menu: Portfolio (landing page,
+case studies, CV, skills, contact) and Cumpleaños (built later). The owner, Hazel,
+edits all content herself through a CMS at /admin, so the code must never be the
+place where content lives.
+
+## Stack
+- Framework: Astro, static output.
+- Hosting: Cloudflare Pages. Build command `npm run build`, output folder `dist/`.
+- CMS: Sveltia CMS served at `/admin` (Decap-compatible `public/admin/config.yml`),
+  GitHub backend, login handled by a separate Cloudflare Worker (base_url in config).
+- Styling: CSS custom properties for every design token. No hardcoded colors,
+  font families, radii, or shadows inside components.
+
+## Folder map
+- `src/content/projects/`   one Markdown file per case study
+- `src/content/settings/profile.json`   name, bio, CV entries, skills, social links
+- `src/content/settings/theme.json`     design choices Hazel can change
+- `src/assets/uploads/`     images uploaded through the CMS (kept under src/ so
+                            Astro can optimize them)
+- `src/components/`         one component per section
+- `src/styles/tokens.css`   all design tokens and the named token sets
+- `public/admin/`           CMS entry point (index.html + config.yml)
+
+## Golden rules
+1. No hardcoded content. Every text, image, link, and list on the page comes from
+   `src/content/`. If a component needs new content, add a field; never inline copy.
+2. Every content field exists in TWO places and they must match: the Astro content
+   collection schema AND `public/admin/config.yml`. When you add, rename, or remove
+   a field, update both in the same change and tell me you did.
+3. `theme.json` only stores choices from predefined options (for example
+   accent: pink | yellow | periwinkle). It never stores raw hex values. Each option
+   maps to a token set defined in `src/styles/tokens.css`.
+4. Section order and visibility come from the `sections` list in `theme.json`.
+   The page renders sections in that order and skips hidden ones.
+5. Images go through Astro's image pipeline (the `image()` schema helper and
+   `<Image />`). Verify that the path format the CMS writes for uploads resolves
+   correctly with that helper, and test it with a real upload.
+6. Mobile-first, responsive, WCAG AA contrast, respect `prefers-reduced-motion`.
+7. Do not add dependencies without asking me first. Pin exact versions.
+8. Work in small steps. After each step, run `npm run build` and fix any error
+   before continuing. Summarize what changed and which files you touched.
+
+## Design direction
+Editorial structure (generous whitespace, strong grid, thin dividers, image-led
+project cards) with playful accents used sparingly (thick outlines, hard offset
+shadows with no blur, a few sticker-like shapes, bold accent color in the hero).
+Use the UI UX Pro Max skill for design-system decisions.
+
+## Out of scope for you (the human does these)
+- Creating the GitHub repo, OAuth app, and adding Hazel as a collaborator.
+- Anything in the Cloudflare dashboard, and deploying or configuring the auth Worker.
+- Secrets: never write client secrets, tokens, or keys into any file in this repo.
+  If a step needs one, stop and tell me where it should be configured.
