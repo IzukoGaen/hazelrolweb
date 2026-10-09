@@ -1,0 +1,100 @@
+/*
+  Design tokens. Components only read these custom properties.
+  Named sets are selected by attributes on <html>, driven by theme.json:
+    data-accent="cinnamoroll | pink | yellow | periwinkle"
+  `--accent` is a fill colour (backgrounds, stickers, shadows) and is always
+  paired with `--on-accent`. `--accent-text` is the AA-safe variant for text
+  on `--surface` / `--paper`.
+*/
+
+:root {
+  /* Neutrals */
+  --paper: #f6f9fc;
+  --surface: #ffffff;
+  --ink: #1d2a44;
+  --ink-soft: #4d5b74;
+  --line: rgba(29, 42, 68, 0.12);
+  --outline: #1d2a44;
+
+  /* Typography */
+  --font-sans: "General Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: clamp(1.25rem, 2.2vw, 1.75rem);
+  --text-xl: clamp(1.5rem, 3vw, 2.5rem);
+  --text-2xl: clamp(2.25rem, 6vw, 5rem);
+  --text-display: clamp(4rem, 15vw, 13.5rem);
+
+  --leading-tight: 0.95;
+  --leading-snug: 1.2;
+  --leading-body: 1.6;
+  --tracking-tight: -0.045em;
+  --tracking-label: 0.04em;
+
+  /* Spacing (spacious, 8px rhythm) */
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2rem;
+  --space-6: 3rem;
+  --space-8: 4rem;
+  --space-12: 6rem;
+  --gutter: clamp(1rem, 3vw, 2rem);
+  --max-width: 1320px;
+
+  /* Shape */
+  --radius-none: 0;
+  --radius-md: 12px;
+  --radius-pill: 999px;
+  --border-thin: 1px;
+  --border-thick: 2.5px;
+
+  /* Playful accents: hard offset shadows, never blurred */
+  --shadow-hard-sm: 3px 3px 0 var(--outline);
+  --shadow-hard: 6px 6px 0 var(--outline);
+  --shadow-hard-accent: 6px 6px 0 var(--accent);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 200ms;
+  --duration-base: 350ms;
+  --duration-slow: 800ms;
+}
+
+/* ---------- Accent sets ---------- */
+
+:root,
+[data-accent="cinnamoroll"] {
+  --accent: #a9d8f5;
+  --accent-soft: #e3f3fc;
+  --accent-text: #2f6fa8;
+  --on-accent: #1d2a44;
+  --highlight: #f6b3c8;
+}
+
+[data-accent="pink"] {
+  --accent: #f6b3c8;
+  --accent-soft: #fde4ec;
+  --accent-text: #b0306a;
+  --on-accent: #1d2a44;
+  --highlight: #a9d8f5;
+}
+
+[data-accent="yellow"] {
+  --accent: #ffd95a;
+  --accent-soft: #fff4cc;
+  --accent-text: #8a6100;
+  --on-accent: #1d2a44;
+  --highlight: #f6b3c8;
+}
+
+[data-accent="periwinkle"] {
+  --accent: #b8b9f5;
+  --accent-soft: #ecebfd;
+  --accent-text: #4a46b8;
+  --on-accent: #1d2a44;
+  --highlight: #ffd95a;
+}

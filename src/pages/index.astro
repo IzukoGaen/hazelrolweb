@@ -1,0 +1,16 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import profile from "../content/settings/profile.json";
+import theme from "../content/settings/theme.json";
+---
+
+<BaseLayout
+  title={profile.siteTitle}
+  description={profile.siteDescription}
+  lang={profile.language}
+  accent={theme.accent}
+>
+  <main class="container">
+    <h1>{profile.name}</h1>
+  </main>
+</BaseLayout>
