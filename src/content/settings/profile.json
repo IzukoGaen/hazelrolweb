@@ -1,6 +1,77 @@
 {
   "name": "Hazel Rol",
-  "siteTitle": "Hazel Rol — Portafolio de Mercadotecnia",
-  "siteDescription": "Estudiante de la Licenciatura en Mercadotecnia Estratégica en la UASLP. Estrategia de marca, redes sociales e investigación de mercados.",
-  "language": "es"
+  "language": "es",
+  "seo": {
+    "title": "Hazel Rol — Portafolio de Mercadotecnia",
+    "description": "Estudiante de la Licenciatura en Mercadotecnia Estratégica en la UASLP. Estrategia de marca, redes sociales e investigación de mercados."
+  },
+  "nav": {
+    "work": "Proyectos",
+    "about": "Sobre mí",
+    "services": "Servicios",
+    "contact": "Contacto",
+    "cta": "Trabajemos juntos"
+  },
+  "hero": {
+    "eyebrow": "Portafolio de Mercadotecnia",
+    "tagline": "Marca · Redes · Estrategia",
+    "status": "Disponible para prácticas",
+    "intro": "Hola, soy Hazel — estudiante de Mercadotecnia Estratégica en la UASLP. Creo que las mejores marcas se sienten como una conversación, no como un anuncio.",
+    "statement": "Construyamos marcas que la gente recuerde — con estrategia clara, historias honestas y un toque de *calidez*.",
+    "scrollLabel": "Ver proyectos"
+  },
+  "skills": [
+    "Estrategia de Marca",
+    "Redes Sociales",
+    "Negocios",
+    "Administración",
+    "Investigación de Mercados"
+  ],
+  "about": {
+    "heading": "Sobre mí",
+    "lead": "Me da curiosidad entender por qué las personas eligen lo que eligen. Convierto investigación en ideas, y las ideas en campañas que se sienten *humanas*.",
+    "paragraphs": [
+      "Actualmente curso la Licenciatura en Mercadotecnia Estratégica en la Universidad Autónoma de San Luis Potosí, con especialización en negocios, administración y marketing.",
+      "Me encanta todo el proceso: conocer a la audiencia, encontrar el insight y convertirlo en algo que la gente quiera compartir. Busco una oportunidad para aprender de un gran equipo y aportar ideas frescas."
+    ],
+    "facts": [
+      { "label": "Licenciatura", "value": "Mercadotecnia Estratégica" },
+      { "label": "Universidad", "value": "Universidad Autónoma de San Luis Potosí" },
+      { "label": "Especialización", "value": "Negocios, administración y marketing" },
+      { "label": "Ubicación", "value": "San Luis Potosí, México" }
+    ],
+    "portraitAlt": "Retrato de Hazel"
+  },
+  "work": {
+    "heading": "Proyectos *destacados*",
+    "intro": "Algunos proyectos de clase, freelance y experimentos personales."
+  },
+  "services": {
+    "heading": "Lo que *hago*",
+    "intro": "Las habilidades que aporto a un equipo desde el primer día.",
+    "items": [
+      { "title": "Estrategia de Marca", "description": "Posicionamiento, tono y mensajes que hacen que una marca sea fácil de reconocer y difícil de olvidar." },
+      { "title": "Redes Sociales", "description": "Calendarios de contenido, ideas para video corto y manejo de comunidad que crean seguidores reales." },
+      { "title": "Investigación de Mercados", "description": "Encuestas, entrevistas y análisis de competencia convertidos en insights claros y accionables." },
+      { "title": "Negocios y Administración", "description": "Planes de negocio, presupuestos y KPIs para que cada campaña tenga sentido y se pueda medir." }
+    ],
+    "stats": [
+      { "value": "12+", "label": "Proyectos realizados" },
+      { "value": "4", "label": "Marcas apoyadas" },
+      { "value": "3", "label": "Áreas de especialización" }
+    ]
+  },
+  "contact": {
+    "heading": "¿Contamos juntos la próxima *historia* de tu marca?",
+    "email": "hola@hazelrol.com",
+    "socials": [
+      { "label": "LinkedIn", "url": "https://www.linkedin.com/" },
+      { "label": "Instagram", "url": "https://www.instagram.com/" }
+    ],
+    "cvLabel": "CV (PDF)"
+  },
+  "footer": {
+    "note": "Hecho con cariño en SLP",
+    "backToTop": "Volver arriba"
+  }
 }

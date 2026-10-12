@@ -1,16 +1,24 @@
 ---
+import { getEntry } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import profile from "../content/settings/profile.json";
-import theme from "../content/settings/theme.json";
+
+const profile = await getEntry("profile", "profile");
+const theme = await getEntry("theme", "theme");
+
+if (!profile || !theme) {
+  throw new Error("Missing src/content/settings/profile.json or theme.json");
+}
+
+const { data: p } = profile;
 ---
 
 <BaseLayout
-  title={profile.siteTitle}
-  description={profile.siteDescription}
-  lang={profile.language}
-  accent={theme.accent}
+  title={p.seo.title}
+  description={p.seo.description}
+  lang={p.language}
+  accent={theme.data.accent}
 >
   <main class="container">
-    <h1>{profile.name}</h1>
+    <h1>{p.name}</h1>
   </main>
 </BaseLayout>

@@ -1,0 +1,175 @@
+# Keep every field here in sync with src/content.config.ts.
+
+backend:
+  name: github
+  repo: OWNER/REPO # TODO(human): GitHub "owner/repo" of this site
+  branch: main
+  base_url: https://YOUR-AUTH-WORKER.workers.dev # TODO(human): URL of the Cloudflare auth Worker
+
+# Images live under src/ so Astro can optimise them. Content files sit two
+# folders deep (src/content/settings, src/content/projects), so the path
+# written into them is relative to that depth.
+media_folder: src/assets/uploads
+public_folder: ../../assets/uploads
+
+locale: es
+
+collections:
+  - name: settings
+    label: Ajustes
+    files:
+      - name: profile
+        label: Perfil y textos
+        file: src/content/settings/profile.json
+        fields:
+          - { name: name, label: Nombre, widget: string }
+          - { name: language, label: "Idioma (código, ej. es)", widget: string }
+          - name: seo
+            label: Buscadores (SEO)
+            widget: object
+            fields:
+              - { name: title, label: Título de la pestaña, widget: string }
+              - { name: description, label: Descripción, widget: text }
+          - name: nav
+            label: Menú
+            widget: object
+            fields:
+              - { name: work, label: Proyectos, widget: string }
+              - { name: about, label: Sobre mí, widget: string }
+              - { name: services, label: Servicios, widget: string }
+              - { name: contact, label: Contacto, widget: string }
+              - { name: cta, label: Botón del menú, widget: string }
+          - name: hero
+            label: Portada
+            widget: object
+            fields:
+              - { name: eyebrow, label: Texto superior, widget: string }
+              - { name: tagline, label: Lema corto, widget: string }
+              - { name: status, label: Disponibilidad, widget: string }
+              - { name: intro, label: Presentación, widget: text }
+              - { name: statement, label: Frase principal, widget: text, hint: "Pon *asteriscos* alrededor de una palabra para resaltarla en cursiva." }
+              - { name: scrollLabel, label: Texto del enlace a proyectos, widget: string }
+          - name: skills
+            label: Habilidades (cinta animada)
+            widget: list
+            field: { name: skill, label: Habilidad, widget: string }
+          - name: about
+            label: Sobre mí
+            widget: object
+            fields:
+              - { name: heading, label: Título, widget: string }
+              - { name: lead, label: Frase destacada, widget: text, hint: "Pon *asteriscos* alrededor de una palabra para resaltarla en cursiva." }
+              - name: paragraphs
+                label: Párrafos
+                widget: list
+                field: { name: paragraph, label: Párrafo, widget: text }
+              - name: facts
+                label: Datos
+                widget: list
+                fields:
+                  - { name: label, label: Etiqueta, widget: string }
+                  - { name: value, label: Valor, widget: string }
+              - { name: portrait, label: Retrato, widget: image, required: false }
+              - { name: portraitAlt, label: Descripción del retrato, widget: string, required: false }
+          - name: work
+            label: Sección de proyectos
+            widget: object
+            fields:
+              - { name: heading, label: Título, widget: string, hint: "Pon *asteriscos* alrededor de una palabra para resaltarla en cursiva." }
+              - { name: intro, label: Introducción, widget: text }
+          - name: services
+            label: Servicios
+            widget: object
+            fields:
+              - { name: heading, label: Título, widget: string, hint: "Pon *asteriscos* alrededor de una palabra para resaltarla en cursiva." }
+              - { name: intro, label: Introducción, widget: text }
+              - name: items
+                label: Servicios
+                widget: list
+                fields:
+                  - { name: title, label: Título, widget: string }
+                  - { name: description, label: Descripción, widget: text }
+              - name: stats
+                label: Números
+                widget: list
+                fields:
+                  - { name: value, label: Número, widget: string }
+                  - { name: label, label: Etiqueta, widget: string }
+          - name: contact
+            label: Contacto
+            widget: object
+            fields:
+              - { name: heading, label: Título, widget: string, hint: "Pon *asteriscos* alrededor de una palabra para resaltarla en cursiva." }
+              - { name: email, label: Correo, widget: string }
+              - name: socials
+                label: Redes
+                widget: list
+                fields:
+                  - { name: label, label: Nombre, widget: string }
+                  - { name: url, label: Enlace, widget: string }
+              - name: cv
+                label: CV (PDF)
+                widget: file
+                required: false
+                media_folder: /public/files
+                public_folder: /files
+              - { name: cvLabel, label: Texto del enlace al CV, widget: string }
+          - name: footer
+            label: Pie de página
+            widget: object
+            fields:
+              - { name: note, label: Nota, widget: string }
+              - { name: backToTop, label: Texto "volver arriba", widget: string }
+
+      - name: theme
+        label: Diseño
+        file: src/content/settings/theme.json
+        fields:
+          - name: accent
+            label: Color de acento
+            widget: select
+            options:
+              - { label: Cinnamoroll (azul cielo), value: cinnamoroll }
+              - { label: Rosa, value: pink }
+              - { label: Amarillo, value: yellow }
+              - { label: Lavanda, value: periwinkle }
+          - name: sections
+            label: Secciones (arrastra para reordenar)
+            widget: list
+            allow_add: false
+            allow_remove: false
+            summary: "{{fields.id}} — visible: {{fields.visible}}"
+            fields:
+              - name: id
+                label: Sección
+                widget: select
+                options:
+                  - { label: Portada, value: hero }
+                  - { label: Habilidades, value: skills }
+                  - { label: Sobre mí, value: about }
+                  - { label: Proyectos, value: work }
+                  - { label: Servicios, value: services }
+                  - { label: Contacto, value: contact }
+              - { name: visible, label: Visible, widget: boolean }
+
+  - name: projects
+    label: Proyectos
+    label_singular: Proyecto
+    folder: src/content/projects
+    extension: md
+    format: frontmatter
+    create: true
+    slug: "{{slug}}"
+    sortable_fields: [order, year, title]
+    fields:
+      - { name: title, label: Título, widget: string }
+      - { name: category, label: Categoría, widget: string }
+      - { name: year, label: Año, widget: number, value_type: int }
+      - { name: summary, label: Resumen, widget: text }
+      - { name: resultValue, label: Resultado (número), widget: string, required: false }
+      - { name: resultLabel, label: Resultado (texto), widget: string, required: false }
+      - { name: cover, label: Portada, widget: image, required: false }
+      - { name: coverAlt, label: Descripción de la portada, widget: string, required: false }
+      - { name: order, label: Orden, widget: number, value_type: int, default: 0 }
+      - { name: draft, label: Borrador, widget: boolean, default: false }
+      - { name: body, label: Caso de estudio, widget: markdown }

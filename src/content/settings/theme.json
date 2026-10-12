@@ -1,3 +1,11 @@
 {
-  "accent": "cinnamoroll"
+  "accent": "cinnamoroll",
+  "sections": [
+    { "id": "hero", "visible": true },
+    { "id": "skills", "visible": true },
+    { "id": "about", "visible": true },
+    { "id": "work", "visible": true },
+    { "id": "services", "visible": true },
+    { "id": "contact", "visible": true }
+  ]
 }
