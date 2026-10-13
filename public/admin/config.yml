@@ -2,7 +2,7 @@
 
 backend:
   name: github
-  repo: OWNER/REPO # TODO(human): GitHub "owner/repo" of this site
+  repo: IzukoGaen/hazelrolweb
   branch: main
   base_url: https://YOUR-AUTH-WORKER.workers.dev # TODO(human): URL of the Cloudflare auth Worker
 
