@@ -6,17 +6,22 @@ backend:
   branch: main
   base_url: https://sveltia-cms-auth.vm567734.workers.dev
 
-# Images live under src/ so Astro can optimise them. Content files sit two
-# folders deep (src/content/settings, src/content/projects), so the path
-# written into them is relative to that depth.
-media_folder: src/assets/uploads
-public_folder: ../../assets/uploads
+# Images live under src/ so Astro can optimise them. Sveltia requires the
+# top-level folders to be absolute; each collection below overrides them with
+# a path relative to its own folder, which is the form Astro's image() needs.
+media_folder: /src/assets/uploads
+
+# Astro's .optional() rejects the empty strings Sveltia would otherwise save.
+output:
+  omit_empty_optional_fields: true
 
 locale: es
 
 collections:
   - name: settings
     label: Ajustes
+    media_folder: ../../assets/uploads
+    public_folder: ../../assets/uploads
     files:
       - name: profile
         label: Perfil y textos
@@ -156,6 +161,8 @@ collections:
     label: Proyectos
     label_singular: Proyecto
     folder: src/content/projects
+    media_folder: ../../assets/uploads
+    public_folder: ../../assets/uploads
     extension: md
     format: frontmatter
     create: true
