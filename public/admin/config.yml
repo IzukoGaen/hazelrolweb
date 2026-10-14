@@ -4,7 +4,7 @@ backend:
   name: github
   repo: IzukoGaen/hazelrolweb
   branch: main
-  base_url: https://YOUR-AUTH-WORKER.workers.dev # TODO(human): URL of the Cloudflare auth Worker
+  base_url: https://sveltia-cms-auth.vm567734.workers.dev
 
 # Images live under src/ so Astro can optimise them. Content files sit two
 # folders deep (src/content/settings, src/content/projects), so the path
