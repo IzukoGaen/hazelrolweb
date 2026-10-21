@@ -23,7 +23,7 @@ const links = [
       {links.map((link) => <a href={`#${link.id}`}>{link.label}</a>)}
     </nav>
     {visible.has("contact") && (
-      <a class="header-cta" href="#contact">
+      <a class="header-cta pressable" href="#contact">
         {profile.nav.cta} <span aria-hidden="true">→</span>
       </a>
     )}
@@ -188,30 +188,12 @@ const links = [
     .header-cta {
       justify-self: end;
       display: inline-flex;
-      align-items: center;
       gap: 0.4em;
       min-height: 2.5rem;
       padding: 0.4rem 1rem;
-      border: var(--border-thick) solid var(--outline);
       border-radius: var(--radius-pill);
-      background: var(--accent);
-      color: var(--on-accent);
       font-size: var(--text-sm);
-      font-weight: 600;
-      box-shadow: var(--shadow-hard-sm);
-      transition:
-        transform var(--duration-fast) var(--ease-out),
-        box-shadow var(--duration-fast) var(--ease-out);
-    }
-
-    .header-cta:hover {
-      transform: translate(-2px, -2px);
-      box-shadow: var(--shadow-hard-md);
-    }
-
-    .header-cta:active {
-      transform: translate(2px, 2px);
-      box-shadow: none;
+      --press-offset: 3px;
     }
   }
 </style>

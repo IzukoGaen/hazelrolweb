@@ -1,0 +1,59 @@
+---
+// TEMPORARY review page for the Sky Dial, step 1. Delete before merging.
+import "../styles/global.css";
+import SkyDialFace from "../components/SkyDialFace.astro";
+
+const variants = [
+  { color: "rosa", angle: 0 },
+  { color: "celeste", angle: 180 },
+] as const;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Sky Dial preview</title>
+  </head>
+  <body>
+    <main class="preview">
+      {variants.map((v) => (
+        <figure>
+          <div class="large"><SkyDialFace color={v.color} angle={v.angle} /></div>
+          <div class="actual"><SkyDialFace color={v.color} angle={v.angle} /></div>
+          <figcaption class="label">{v.color} · {v.angle}°</figcaption>
+        </figure>
+      ))}
+    </main>
+  </body>
+</html>
+
+<style>
+  .preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-8);
+    justify-content: center;
+    align-items: flex-end;
+    padding: var(--space-8) var(--gutter);
+    min-height: 100vh;
+    background: linear-gradient(180deg, var(--hero-from), var(--hero-to));
+  }
+
+  figure {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-3);
+    margin: 0;
+  }
+
+  .large {
+    width: min(80vw, 22rem);
+  }
+
+  .actual {
+    width: 6.5rem;
+  }
+</style>

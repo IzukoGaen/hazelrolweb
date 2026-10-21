@@ -158,6 +158,76 @@ em {
   transform: translateX(3px);
 }
 
+/*
+  Pressable: face (::before) and hard shadow (::after) are separate layers so
+  the press animates transform only. Set --press-face to change the fill.
+*/
+
+.pressable {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: none;
+  color: var(--on-accent);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--press-out) var(--ease-spring);
+}
+
+.pressable::before,
+.pressable::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.pressable::before {
+  z-index: -1;
+  background: var(--press-face, var(--accent));
+  border: var(--border-thick) solid var(--outline);
+}
+
+.pressable::after {
+  z-index: -2;
+  background: var(--outline);
+  transform: translate(var(--press-offset), var(--press-offset));
+  transition: transform var(--press-out) var(--ease-spring);
+}
+
+@media (hover: hover) {
+  .pressable:hover {
+    transform: translate(calc(-1 * var(--press-lift)), calc(-1 * var(--press-lift)));
+  }
+
+  .pressable:hover::after {
+    transform: translate(
+      calc(var(--press-offset) + var(--press-lift)),
+      calc(var(--press-offset) + var(--press-lift))
+    );
+  }
+}
+
+.pressable:active,
+.pressable.is-pressed {
+  transform: translate(var(--press-offset), var(--press-offset));
+  transition-duration: var(--press-in);
+  transition-timing-function: linear;
+}
+
+.pressable:active::after,
+.pressable.is-pressed::after {
+  transform: translate(0, 0);
+  transition-duration: var(--press-in);
+  transition-timing-function: linear;
+}
+
 .section-title {
   font-size: var(--text-2xl);
   font-weight: 500;

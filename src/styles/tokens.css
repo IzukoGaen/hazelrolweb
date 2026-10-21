@@ -63,11 +63,34 @@
   --shadow-hard-accent: 6px 6px 0 var(--accent);
   --shadow-status: 0 0 0 4px var(--success-ring);
 
+  /* Pressable buttons: the hard shadow is a layer the face travels onto */
+  --press-offset: 4px;
+  --press-lift: 1px;
+  --press-in: 60ms;
+  --press-out: 340ms;
+  --ease-spring: cubic-bezier(0.34, 1.8, 0.64, 1);
+
   /* Motion */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --duration-fast: 200ms;
   --duration-base: 350ms;
   --duration-slow: 800ms;
+}
+
+/* ---------- Sky Dial sets (theme.json dialColor: rosa | celeste) ---------- */
+
+:root,
+[data-dial="rosa"] {
+  --dial-base: #fde6ed;
+  --dial-deep: #f5bfcf;
+  --dial-gold: #d8b05a;
+  --dial-gold-deep: #8a6420;
+  --dial-drop: drop-shadow(3px 3px 0 var(--outline));
+}
+
+[data-dial="celeste"] {
+  --dial-base: #e4f3fd;
+  --dial-deep: #b5daf3;
 }
 
 /* ---------- Accent sets ---------- */
