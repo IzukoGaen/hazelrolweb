@@ -93,6 +93,123 @@
   --dial-deep: #b5daf3;
 }
 
+/* ---------- Wax seal (contact confirmation) ---------- */
+
+:root {
+  --seal-wax: #e7839f;
+  --seal-wax-deep: #b9506f;
+  --seal-emboss: #fde6ed;
+  --letter-paper: #fffaf3;
+}
+
+/*
+  ---------- Sky scene ----------
+  The scene blends between these keyframes as the Sky Dial turns. Keyframe
+  names and hours live in src/lib/skyPalette.ts; values must be 6-digit hex.
+  The live values are written to the registered --sky-<part> properties.
+*/
+
+@property --sky-top { syntax: "<color>"; inherits: true; initial-value: #3fa2f0; }
+@property --sky-mid { syntax: "<color>"; inherits: true; initial-value: #86cdfa; }
+@property --sky-bottom { syntax: "<color>"; inherits: true; initial-value: #d4f0ff; }
+@property --sky-far { syntax: "<color>"; inherits: true; initial-value: #9cc3ec; }
+@property --sky-hill { syntax: "<color>"; inherits: true; initial-value: #6cc59a; }
+@property --sky-near { syntax: "<color>"; inherits: true; initial-value: #3f9a6c; }
+@property --sky-cloud { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
+@property --sky-glow { syntax: "<color>"; inherits: true; initial-value: #fff7d6; }
+@property --sky-mist { syntax: "<color>"; inherits: true; initial-value: #e6f6ff; }
+@property --sky-stars { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --sky-lights { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --sky-horizon { syntax: "<number>"; inherits: true; initial-value: 0; }
+
+:root {
+  --sky-sun-core: #fff6d8;
+  --sky-moon-core: #f4f1ff;
+  --sky-window: #ffd98a;
+  --sky-star: #fffbea;
+  --sky-transition: 700ms;
+
+  --sky-midnight-top: #0b1033;
+  --sky-midnight-mid: #1b2257;
+  --sky-midnight-bottom: #3a3f7a;
+  --sky-midnight-far: #262d63;
+  --sky-midnight-hill: #1c2353;
+  --sky-midnight-near: #111836;
+  --sky-midnight-cloud: #3b4378;
+  --sky-midnight-glow: #8fa0ff;
+  --sky-midnight-mist: #2c3570;
+
+  --sky-predawn-top: #141a4a;
+  --sky-predawn-mid: #3b3a7a;
+  --sky-predawn-bottom: #8a6aa8;
+  --sky-predawn-far: #3d417e;
+  --sky-predawn-hill: #2b3168;
+  --sky-predawn-near: #1b2250;
+  --sky-predawn-cloud: #6a6aa6;
+  --sky-predawn-glow: #c7a6ff;
+  --sky-predawn-mist: #5b5a99;
+
+  --sky-sunrise-top: #6d83d6;
+  --sky-sunrise-mid: #f5a9c4;
+  --sky-sunrise-bottom: #ffd6a5;
+  --sky-sunrise-far: #c79ccf;
+  --sky-sunrise-hill: #9b8fcf;
+  --sky-sunrise-near: #6b73b5;
+  --sky-sunrise-cloud: #ffe3ec;
+  --sky-sunrise-glow: #ffb98a;
+  --sky-sunrise-mist: #f7c6d9;
+
+  --sky-morning-top: #5fb4f2;
+  --sky-morning-mid: #9fd8fb;
+  --sky-morning-bottom: #e3f6ff;
+  --sky-morning-far: #a9c7ea;
+  --sky-morning-hill: #7fc4a8;
+  --sky-morning-near: #4ea67a;
+  --sky-morning-cloud: #ffffff;
+  --sky-morning-glow: #fff2c4;
+  --sky-morning-mist: #dff1ff;
+
+  --sky-noon-top: #3fa2f0;
+  --sky-noon-mid: #86cdfa;
+  --sky-noon-bottom: #d4f0ff;
+  --sky-noon-far: #9cc3ec;
+  --sky-noon-hill: #6cc59a;
+  --sky-noon-near: #3f9a6c;
+  --sky-noon-cloud: #ffffff;
+  --sky-noon-glow: #fff7d6;
+  --sky-noon-mist: #e6f6ff;
+
+  --sky-golden-top: #6aa8e8;
+  --sky-golden-mid: #f6c98f;
+  --sky-golden-bottom: #ffe2b0;
+  --sky-golden-far: #c9a7c9;
+  --sky-golden-hill: #a7b86f;
+  --sky-golden-near: #6f9150;
+  --sky-golden-cloud: #fff0d9;
+  --sky-golden-glow: #ffcf7a;
+  --sky-golden-mist: #ffe3c0;
+
+  --sky-sunset-top: #5b5fb8;
+  --sky-sunset-mid: #f08aa6;
+  --sky-sunset-bottom: #ffb27a;
+  --sky-sunset-far: #9a6fa8;
+  --sky-sunset-hill: #7a5a8f;
+  --sky-sunset-near: #463e66;
+  --sky-sunset-cloud: #ffc3b5;
+  --sky-sunset-glow: #ff9a6b;
+  --sky-sunset-mist: #f5a3a8;
+
+  --sky-dusk-top: #232a6b;
+  --sky-dusk-mid: #6a4f9a;
+  --sky-dusk-bottom: #d47a9a;
+  --sky-dusk-far: #4a3f7f;
+  --sky-dusk-hill: #352f66;
+  --sky-dusk-near: #211c45;
+  --sky-dusk-cloud: #8a6fa6;
+  --sky-dusk-glow: #ff9ab8;
+  --sky-dusk-mist: #6d5b9a;
+}
+
 /* ---------- Accent sets ---------- */
 
 :root,
@@ -134,4 +251,28 @@
   --highlight: #ffd95a;
   --hero-from: #b8b9f5;
   --hero-to: #f0f0fe;
+}
+
+/*
+  ---------- Night text theme ----------
+  Set on <html> by the sky scene from 20:00 to 05:00. Must stay after the
+  accent sets so it wins at equal specificity. Accent fills stay pastel with
+  dark --on-accent text; --accent-text becomes the pastel itself (AA on dark).
+*/
+
+[data-sky-theme="dark"] {
+  color-scheme: dark;
+  --paper: #10162e;
+  --surface: #1a2340;
+  --ink: #eef2fb;
+  --ink-soft: #b9c3da;
+  --line: rgba(238, 242, 251, 0.14);
+  --outline: #05081a;
+  --success: #57d68d;
+  --success-ring: rgba(87, 214, 141, 0.22);
+  --header-bg: rgba(16, 22, 46, 0.82);
+  --accent-text: var(--accent);
+  --accent-soft: color-mix(in srgb, var(--accent) 22%, #1a2340);
+  --hero-from: #232a6b;
+  --hero-to: #1a2340;
 }

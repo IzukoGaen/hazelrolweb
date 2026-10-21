@@ -31,6 +31,7 @@ const { title, description, lang, accent, skipLink } = Astro.props;
     </script>
   </head>
   <body>
+    <slot name="backdrop" />
     <a class="skip-link" href="#main">{skipLink}</a>
     <slot />
     <script>

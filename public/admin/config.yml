@@ -121,6 +121,7 @@ collections:
                 media_folder: /public/files
                 public_folder: /files
               - { name: cvLabel, label: Texto del enlace al CV, widget: string }
+              - { name: sealMessage, label: Mensaje al sellar la carta (al hacer clic en el correo), widget: string }
           - name: footer
             label: Pie de página
             widget: object

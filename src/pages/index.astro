@@ -10,6 +10,7 @@ import Services from "../components/Services.astro";
 import Contact from "../components/Contact.astro";
 import Footer from "../components/Footer.astro";
 import SkyDial from "../components/SkyDial.astro";
+import SkyScene from "../components/SkyScene.astro";
 import { visibleSections, type SectionId } from "../lib/sections";
 
 const profileEntry = await getEntry("profile", "profile");
@@ -56,6 +57,7 @@ function componentFor(id: SectionId) {
   accent={theme.accent}
   skipLink={profile.nav.skipLink}
 >
+  {theme.showSkyDial && <SkyScene slot="backdrop" />}
   <Header profile={profile} visible={visible} />
   <main id="main">
     {sections.map((id) => {

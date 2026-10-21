@@ -99,6 +99,29 @@ const year = new Date().getFullYear();
     background: linear-gradient(180deg, var(--hero-from) 0%, var(--hero-to) 100%);
   }
 
+  /*
+    With the sky scene on, the hero becomes a window onto it. The mist at the
+    bottom is the theme surface, so the name keeps its contrast at any hour.
+  */
+  :global([data-sky-scene]) .hero .frame {
+    background: transparent;
+  }
+
+  :global([data-sky-scene]) .hero-meta,
+  :global([data-sky-scene]) .hero-bottom {
+    background: var(--surface);
+  }
+
+  :global([data-sky-scene]) .hero-visual {
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      transparent 28%,
+      color-mix(in srgb, var(--surface) 72%, transparent) 60%,
+      color-mix(in srgb, var(--surface) 92%, transparent) 100%
+    );
+  }
+
   .cloud {
     position: absolute;
     width: var(--w);

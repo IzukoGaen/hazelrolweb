@@ -65,6 +65,7 @@ const profile = defineCollection({
         socials: z.array(link),
         cv: z.string().optional(),
         cvLabel: z.string(),
+        sealMessage: z.string(),
       }),
       footer: z.object({
         note: z.string(),
