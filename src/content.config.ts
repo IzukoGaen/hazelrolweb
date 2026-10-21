@@ -28,6 +28,8 @@ const profile = defineCollection({
         services: z.string(),
         contact: z.string(),
         cta: z.string(),
+        menu: z.string(),
+        skipLink: z.string(),
       }),
       hero: z.object({
         eyebrow: z.string(),
@@ -91,7 +93,8 @@ const projects = defineCollection({
       category: z.string(),
       year: z.number().int(),
       summary: z.string(),
-      resultValue: z.string().optional(),
+      // The CMS may save numeric-looking text like 320 unquoted in YAML.
+      resultValue: z.union([z.string(), z.number()]).transform(String).optional(),
       resultLabel: z.string().optional(),
       cover: image().optional(),
       coverAlt: z.string().optional(),

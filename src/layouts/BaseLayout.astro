@@ -6,9 +6,10 @@ interface Props {
   description: string;
   lang: string;
   accent: string;
+  skipLink: string;
 }
 
-const { title, description, lang, accent } = Astro.props;
+const { title, description, lang, accent, skipLink } = Astro.props;
 ---
 
 <!doctype html>
@@ -23,8 +24,29 @@ const { title, description, lang, accent } = Astro.props;
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" />
+    <script is:inline>
+      if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        document.documentElement.classList.add("js");
+      }
+    </script>
   </head>
   <body>
+    <a class="skip-link" href="#main">{skipLink}</a>
     <slot />
+    <script>
+      if (document.documentElement.classList.contains("js")) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (!entry.isIntersecting) continue;
+              entry.target.classList.add("is-visible");
+              observer.unobserve(entry.target);
+            }
+          },
+          { threshold: 0.15, rootMargin: "0px 0px -40px 0px" }
+        );
+        document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+      }
+    </script>
   </body>
 </html>

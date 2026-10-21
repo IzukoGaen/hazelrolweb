@@ -1,0 +1,61 @@
+---
+import type { SectionProps } from "../lib/sections";
+
+type Props = SectionProps;
+
+const { skills } = Astro.props.profile;
+---
+
+{skills.length > 0 && (
+  <section class="marquee">
+    <ul class="track">
+      {skills.map((skill) => (
+        <li>{skill}</li>
+      ))}
+    </ul>
+    <ul class="track" aria-hidden="true">
+      {skills.map((skill) => (
+        <li>{skill}</li>
+      ))}
+    </ul>
+  </section>
+)}
+
+<style>
+  .marquee {
+    display: flex;
+    overflow: hidden;
+    background: var(--ink);
+    color: var(--surface);
+    border-block: var(--border-thick) solid var(--outline);
+  }
+
+  .track {
+    display: flex;
+    flex-shrink: 0;
+    gap: var(--space-4);
+    padding: var(--space-2) var(--space-2) var(--space-2) 0;
+    font-size: var(--text-lg);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    animation: scroll 32s linear infinite;
+  }
+
+  .track li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .track li::before {
+    content: "✦" / "";
+    color: var(--accent);
+  }
+
+  @keyframes scroll {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+</style>
