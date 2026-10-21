@@ -70,6 +70,22 @@
   --duration-slow: 800ms;
 }
 
+/* ---------- Sky Dial sets (theme.json dialColor: rosa | celeste) ---------- */
+
+:root,
+[data-dial="rosa"] {
+  --dial-base: #fde6ed;
+  --dial-deep: #f5bfcf;
+  --dial-gold: #d8b05a;
+  --dial-gold-deep: #8a6420;
+  --dial-drop: drop-shadow(3px 3px 0 var(--outline));
+}
+
+[data-dial="celeste"] {
+  --dial-base: #e4f3fd;
+  --dial-deep: #b5daf3;
+}
+
 /* ---------- Accent sets ---------- */
 
 :root,

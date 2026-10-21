@@ -1,0 +1,204 @@
+---
+// Static astrolabe face for the Sky Dial. The inner disc rotates with
+// --dial-angle (0deg = 00:00, 180deg = 12:00); the moon sits at the top of the
+// disc and the sun at the bottom, so each reaches the fixed pointer upright at
+// midnight and noon respectively.
+
+export type DialColor = "rosa" | "celeste";
+
+interface Props {
+  color: DialColor;
+  angle?: number;
+  class?: string;
+}
+
+const { color, angle = 0, class: className } = Astro.props;
+
+const C = 100;
+const motifId = `acanthus-${color}-${Math.random().toString(36).slice(2, 8)}`;
+const scrollAngles = Array.from({ length: 12 }, (_, i) => 15 + i * 30);
+const berryAngles = Array.from({ length: 11 }, (_, i) => 30 + i * 30);
+const ticks = Array.from({ length: 24 }, (_, hour) => {
+  const length = hour % 6 === 0 ? 9 : hour % 3 === 0 ? 6 : 4;
+  const weight = hour % 6 === 0 ? "major" : hour % 3 === 0 ? "mid" : "minor";
+  return { angle: hour * 15, length, weight };
+});
+const rays = Array.from({ length: 12 }, (_, i) => i * 30);
+const petals = Array.from({ length: 8 }, (_, i) => i * 45);
+---
+
+<svg
+  class:list={["sky-dial-face", className]}
+  data-dial={color}
+  viewBox="0 0 200 200"
+  style={`--dial-angle: ${angle}deg`}
+  aria-hidden="true"
+  focusable="false"
+>
+  <defs>
+    <g id={motifId}>
+      <path class="fill-gold" d="M100 8.5C103.5 11 104 15.5 100 19.5C96 15.5 96.5 11 100 8.5Z" />
+      <path class="line-deep thin" d="M100 10.5V18" />
+      <path
+        class="line-gold"
+        d="M101.5 18.5C105 18.5 109 16.5 109.5 13C110 10 106.5 9 105.5 11.5C105 13 106.8 13.8 107.5 12.6"
+      />
+      <path
+        class="line-gold"
+        transform="translate(200 0) scale(-1 1)"
+        d="M101.5 18.5C105 18.5 109 16.5 109.5 13C110 10 106.5 9 105.5 11.5C105 13 106.8 13.8 107.5 12.6"
+      />
+    </g>
+  </defs>
+
+  <!-- Outer frame: gold rim and acanthus-scroll band -->
+  <circle class="fill-gold" cx={C} cy={C} r="97" />
+  <circle class="fill-deep" cx={C} cy={C} r="93.5" />
+  {scrollAngles.map((a) => (
+    <use href={`#${motifId}`} transform={`rotate(${a} ${C} ${C})`} />
+  ))}
+  {berryAngles.map((a) => (
+    <circle class="fill-gold" cx={C} cy="12.5" r="1.4" transform={`rotate(${a} ${C} ${C})`} />
+  ))}
+  <circle class="line-gold" cx={C} cy={C} r="80.5" />
+
+  <!-- Inner disc: rotates with the time of day -->
+  <g class="disc">
+    <circle class="fill-base" cx={C} cy={C} r="79" />
+
+    <circle class="line-deep thin" cx={C} cy={C} r="76.5" />
+    <circle class="line-deep thin" cx={C} cy={C} r="65.5" />
+    {ticks.map((tick) => (
+      <line
+        class:list={["tick", tick.weight]}
+        x1={C}
+        y1="24"
+        x2={C}
+        y2={24 + tick.length}
+        transform={`rotate(${tick.angle} ${C} ${C})`}
+      />
+    ))}
+
+    <!-- Engraved moon (top of disc: under the pointer at midnight) -->
+    <g class="moon">
+      <path
+        class="fill-gold line-deep"
+        d="M103 44.6A10 10 0 1 0 103 63.4A11 11 0 0 1 103 44.6Z"
+      />
+      <circle class="fill-deep-ink" cx="96.3" cy="52" r="0.9" />
+      <path class="line-deep thin" d="M95.2 57.2Q96.8 58.4 98.4 57.4" />
+      <path class="fill-gold" d="M112 46L113 48.6L115.6 49.6L113 50.6L112 53.2L111 50.6L108.4 49.6L111 48.6Z" />
+      <path class="fill-gold" d="M110.5 57.5L111.1 59L112.6 59.6L111.1 60.2L110.5 61.7L109.9 60.2L108.4 59.6L109.9 59Z" />
+    </g>
+
+    <!-- Engraved sun (bottom of disc: under the pointer at noon) -->
+    <g class="sun" transform={`rotate(180 ${C} ${C})`}>
+      {rays.map((a) => (
+        <path class="fill-gold" d="M97.8 46L100 39.5L102.2 46Z" transform={`rotate(${a} 100 54)`} />
+      ))}
+      <circle class="fill-gold line-deep" cx="100" cy="54" r="8" />
+      <circle class="fill-deep-ink" cx="97.4" cy="52.8" r="0.9" />
+      <circle class="fill-deep-ink" cx="102.6" cy="52.8" r="0.9" />
+      <path class="line-deep thin" d="M97 56.2Q100 58.6 103 56.2" />
+    </g>
+
+    <!-- Central rosette -->
+    {petals.map((a) => (
+      <ellipse class="fill-deep line-gold" cx={C} cy="86" rx="5" ry="11" transform={`rotate(${a} ${C} ${C})`} />
+    ))}
+    {petals.map((a) => (
+      <ellipse
+        class="fill-gold line-deep thin"
+        cx={C}
+        cy="91"
+        rx="3.2"
+        ry="7"
+        transform={`rotate(${a + 22.5} ${C} ${C})`}
+      />
+    ))}
+    <circle class="fill-gold line-deep" cx={C} cy={C} r="5" />
+    <circle class="fill-base" cx={C} cy={C} r="2" />
+  </g>
+
+  <!-- Fixed pointer at the top of the rim -->
+  <path class="fill-gold line-deep" d="M100 22.5L95.5 9.5H104.5Z" />
+</svg>
+
+<style>
+  .sky-dial-face {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    filter: var(--dial-drop);
+  }
+
+  .fill-gold {
+    fill: var(--dial-gold);
+  }
+
+  .fill-deep {
+    fill: var(--dial-deep);
+  }
+
+  .fill-base {
+    fill: var(--dial-base);
+  }
+
+  .fill-deep-ink {
+    fill: var(--dial-gold-deep);
+  }
+
+  .line-gold,
+  .line-deep,
+  .tick {
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .line-gold {
+    stroke: var(--dial-gold);
+    stroke-width: 1.1;
+  }
+
+  path.line-gold:not([class*="fill-"]) {
+    fill: none;
+  }
+
+  .line-deep {
+    stroke: var(--dial-gold-deep);
+    stroke-width: 0.8;
+  }
+
+  path.line-deep:not([class*="fill-"]),
+  circle.line-deep:not([class*="fill-"]),
+  circle.line-gold:not([class*="fill-"]) {
+    fill: none;
+  }
+
+  .thin {
+    stroke-width: 0.6;
+  }
+
+  .tick {
+    stroke: var(--dial-gold-deep);
+  }
+
+  .tick.major {
+    stroke-width: 1.6;
+  }
+
+  .tick.mid {
+    stroke-width: 1.1;
+  }
+
+  .tick.minor {
+    stroke-width: 0.7;
+  }
+
+  .disc {
+    transform-box: view-box;
+    transform-origin: 100px 100px;
+    transform: rotate(var(--dial-angle));
+  }
+</style>
