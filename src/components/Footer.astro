@@ -1,0 +1,49 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  profile: CollectionEntry<"profile">["data"];
+}
+
+const { profile } = Astro.props;
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <p class="label">© {year} {profile.name}</p>
+    <p class="label note">{profile.footer.note}</p>
+    <a class="label link-arrow back" href="#top">
+      {profile.footer.backToTop} <span aria-hidden="true">↑</span>
+    </a>
+  </div>
+</footer>
+
+<style>
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: var(--space-2);
+    padding-block: var(--space-3);
+  }
+
+  .note {
+    display: none;
+  }
+
+  .back {
+    justify-self: end;
+  }
+
+  @media (min-width: 720px) {
+    .footer-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .note {
+      display: block;
+      text-align: center;
+    }
+  }
+</style>

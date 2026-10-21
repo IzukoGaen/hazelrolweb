@@ -13,7 +13,7 @@ const firstNames = nameParts.join(" ");
 const year = new Date().getFullYear();
 ---
 
-<section class="hero" id="top">
+<section class="hero">
   <div class="container frame">
     <div class="grid-row hero-meta">
       <p class="cell label">{hero.eyebrow} — {year}</p>
@@ -85,7 +85,7 @@ const year = new Date().getFullYear();
     height: 0.5rem;
     border-radius: 50%;
     background: var(--success);
-    box-shadow: 0 0 0 4px var(--success-ring);
+    box-shadow: var(--shadow-status);
   }
 
   .hero-visual {

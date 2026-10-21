@@ -61,6 +61,7 @@
   --shadow-hard: 6px 6px 0 var(--outline);
   --shadow-hard-lg: 9px 9px 0 var(--outline);
   --shadow-hard-accent: 6px 6px 0 var(--accent);
+  --shadow-status: 0 0 0 4px var(--success-ring);
 
   /* Motion */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);

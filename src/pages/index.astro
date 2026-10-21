@@ -6,6 +6,9 @@ import Hero from "../components/Hero.astro";
 import Skills from "../components/Skills.astro";
 import About from "../components/About.astro";
 import Work from "../components/Work.astro";
+import Services from "../components/Services.astro";
+import Contact from "../components/Contact.astro";
+import Footer from "../components/Footer.astro";
 import { visibleSections, type SectionId } from "../lib/sections";
 
 const profileEntry = await getEntry("profile", "profile");
@@ -34,8 +37,9 @@ function componentFor(id: SectionId) {
     case "work":
       return Work;
     case "services":
+      return Services;
     case "contact":
-      return null;
+      return Contact;
     default: {
       const unhandled: never = id;
       throw new Error(`Unknown section: ${unhandled}`);
@@ -55,7 +59,8 @@ function componentFor(id: SectionId) {
   <main id="main">
     {sections.map((id) => {
       const Section = componentFor(id);
-      return Section && <Section profile={profile} projects={projects} visible={visible} />;
+      return <Section profile={profile} projects={projects} visible={visible} />;
     })}
   </main>
+  <Footer profile={profile} />
 </BaseLayout>
