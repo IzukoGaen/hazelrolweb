@@ -1,0 +1,257 @@
+---
+import type { CollectionEntry } from "astro:content";
+import SkyDialFace from "./SkyDialFace.astro";
+import type { DialColor } from "../lib/skyTime";
+
+interface Props {
+  color: DialColor;
+  labels: CollectionEntry<"profile">["data"]["skyDial"];
+}
+
+const { color, labels } = Astro.props;
+---
+
+<div class="sky-dial" data-sky-dial data-labels={JSON.stringify(labels)}>
+  <div
+    class="dial-control"
+    role="slider"
+    tabindex="0"
+    aria-label={labels.label}
+    aria-valuemin="0"
+    aria-valuemax="1439"
+    aria-valuenow="0"
+  >
+    <SkyDialFace color={color} />
+  </div>
+  <p class="readout" aria-hidden="true"></p>
+</div>
+
+<script>
+  import { DEGREES_PER_MINUTE, formatClock, periodAt, wrapMinutes, type SkyPeriod } from "../lib/skyTime";
+
+  const STORAGE_KEY = "hazel:sky-dial-minutes";
+  const DRAG_THRESHOLD_PX = 4;
+
+  type Labels = Record<SkyPeriod, string>;
+
+  const root = document.querySelector<HTMLElement>("[data-sky-dial]");
+  const control = root?.querySelector<HTMLElement>(".dial-control");
+  const face = root?.querySelector<SVGElement>(".sky-dial-face");
+  const readout = root?.querySelector<HTMLElement>(".readout");
+
+  if (root && control && face && readout) {
+    const labels = JSON.parse(root.dataset.labels ?? "{}") as Labels;
+    const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+
+    let minutes = 0;
+    // Unwrapped angle, so stepping past midnight keeps turning forward.
+    let angle = 0;
+
+    const labelFor = (period: SkyPeriod): string => {
+      switch (period) {
+        case "night":
+          return labels.night;
+        case "dawn":
+          return labels.dawn;
+        case "day":
+          return labels.day;
+        case "sunset":
+          return labels.sunset;
+        default: {
+          const unhandled: never = period;
+          return unhandled;
+        }
+      }
+    };
+
+    const readStored = (): number | null => {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw === null) return null;
+        const value = Number(raw);
+        return Number.isFinite(value) ? wrapMinutes(value) : null;
+      } catch {
+        return null;
+      }
+    };
+
+    const persist = () => {
+      try {
+        localStorage.setItem(STORAGE_KEY, String(Math.round(minutes)));
+      } catch {
+        // Storage can be unavailable (private mode, blocked cookies); the dial still works.
+      }
+    };
+
+    const render = () => {
+      const text = `${labelFor(periodAt(minutes))}, ${formatClock(minutes)}`;
+      face.style.setProperty("--dial-angle", `${angle}deg`);
+      control.setAttribute("aria-valuenow", String(Math.floor(minutes)));
+      control.setAttribute("aria-valuetext", text);
+      readout.textContent = text;
+      window.dispatchEvent(new CustomEvent("skydial:change", { detail: { minutes } }));
+    };
+
+    const shift = (deltaMinutes: number, animate: boolean) => {
+      root.toggleAttribute("data-animate", animate && !reduceMotion.matches);
+      minutes = wrapMinutes(minutes + deltaMinutes);
+      angle += deltaMinutes * DEGREES_PER_MINUTE;
+      render();
+    };
+
+    const stepToHour = (direction: 1 | -1) => {
+      const current = Math.floor(minutes);
+      const target = direction === 1 ? Math.floor(current / 60) * 60 + 60 : Math.ceil(current / 60) * 60 - 60;
+      shift(target - minutes, true);
+    };
+
+    // Pointer: drag in a circle to turn; a press without movement steps one hour.
+    let dragging = false;
+    let moved = false;
+    let startX = 0;
+    let startY = 0;
+    let lastPointerAngle = 0;
+
+    const pointerAngle = (event: PointerEvent): number => {
+      const rect = control.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      return (Math.atan2(event.clientX - cx, cy - event.clientY) * 180) / Math.PI;
+    };
+
+    control.addEventListener("pointerdown", (event) => {
+      if (event.button !== 0) return;
+      control.setPointerCapture(event.pointerId);
+      dragging = true;
+      moved = false;
+      startX = event.clientX;
+      startY = event.clientY;
+      lastPointerAngle = pointerAngle(event);
+      root.setAttribute("data-dragging", "");
+    });
+
+    control.addEventListener("pointermove", (event) => {
+      if (!dragging) return;
+      if (!moved && Math.hypot(event.clientX - startX, event.clientY - startY) < DRAG_THRESHOLD_PX) return;
+      moved = true;
+      const next = pointerAngle(event);
+      let delta = next - lastPointerAngle;
+      if (delta > 180) delta -= 360;
+      if (delta < -180) delta += 360;
+      lastPointerAngle = next;
+      shift(delta / DEGREES_PER_MINUTE, false);
+    });
+
+    const endDrag = (event: PointerEvent) => {
+      if (!dragging) return;
+      dragging = false;
+      root.removeAttribute("data-dragging");
+      if (event.type === "pointerup" && !moved) {
+        const rect = control.getBoundingClientRect();
+        stepToHour(event.clientX >= rect.left + rect.width / 2 ? 1 : -1);
+        if ("vibrate" in navigator && event.pointerType === "touch") navigator.vibrate(10);
+      }
+      persist();
+    };
+
+    control.addEventListener("pointerup", endDrag);
+    control.addEventListener("pointercancel", endDrag);
+
+    // Keyboard: arrows step an hour (Shift: 15 min), Page keys 3 hours, Home/End jump to the ends.
+    control.addEventListener("keydown", (event) => {
+      const small = event.shiftKey ? 15 : 60;
+      let delta: number | null = null;
+      switch (event.key) {
+        case "ArrowRight":
+        case "ArrowUp":
+          delta = small;
+          break;
+        case "ArrowLeft":
+        case "ArrowDown":
+          delta = -small;
+          break;
+        case "PageUp":
+          delta = 180;
+          break;
+        case "PageDown":
+          delta = -180;
+          break;
+        case "Home":
+          delta = -minutes;
+          break;
+        case "End":
+          delta = 1439 - minutes;
+          break;
+      }
+      if (delta === null) return;
+      event.preventDefault();
+      shift(delta, true);
+      persist();
+    });
+
+    const now = new Date();
+    minutes = readStored() ?? now.getHours() * 60 + now.getMinutes();
+    angle = minutes * DEGREES_PER_MINUTE;
+    render();
+    root.setAttribute("data-ready", "");
+  }
+</script>
+
+<style>
+  .sky-dial {
+    position: fixed;
+    right: max(var(--space-2), env(safe-area-inset-right));
+    bottom: max(var(--space-2), env(safe-area-inset-bottom));
+    z-index: 40;
+    display: grid;
+    justify-items: center;
+    gap: var(--space-1);
+    width: 5.5rem;
+  }
+
+  .dial-control {
+    width: 100%;
+    border-radius: 50%;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .sky-dial[data-dragging] .dial-control {
+    cursor: grabbing;
+  }
+
+  .dial-control:focus-visible {
+    outline: var(--border-thick) solid var(--accent-text);
+    outline-offset: 4px;
+  }
+
+  .sky-dial[data-animate] :global(.disc) {
+    transition: transform var(--duration-base) var(--ease-spring);
+  }
+
+  .readout {
+    padding: 0.1rem 0.6rem;
+    border: var(--border-thin) solid var(--outline);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    color: var(--ink);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+  }
+
+  .sky-dial[data-ready] .readout {
+    opacity: 1;
+  }
+
+  @media (min-width: 720px) {
+    .sky-dial {
+      width: 7rem;
+      right: var(--space-3);
+      bottom: var(--space-3);
+    }
+  }
+</style>

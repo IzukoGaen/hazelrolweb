@@ -235,6 +235,12 @@ em {
   letter-spacing: var(--tracking-tight);
 }
 
+/* Keep the fixed Sky Dial from covering the footer links at the end of the page */
+
+body:has(.sky-dial) .site-footer {
+  padding-bottom: 9rem;
+}
+
 /* Scroll reveal: only hides content once JS has confirmed it can reveal it */
 
 .js .reveal {

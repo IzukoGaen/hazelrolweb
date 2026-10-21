@@ -75,5 +75,12 @@
   "footer": {
     "note": "Hecho con cariño en SLP",
     "backToTop": "Volver arriba"
+  },
+  "skyDial": {
+    "label": "Hora del cielo",
+    "night": "Noche",
+    "dawn": "Amanecer",
+    "day": "Día",
+    "sunset": "Atardecer"
   }
 }
