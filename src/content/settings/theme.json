@@ -1,5 +1,7 @@
 {
   "accent": "cinnamoroll",
+  "dialColor": "rosa",
+  "showSkyDial": true,
   "sections": [
     { "id": "hero", "visible": true },
     { "id": "skills", "visible": true },

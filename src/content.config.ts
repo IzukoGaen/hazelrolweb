@@ -5,6 +5,7 @@ import { z } from "astro/zod";
 // Keep every field here in sync with public/admin/config.yml.
 
 export const ACCENTS = ["cinnamoroll", "pink", "yellow", "periwinkle"] as const;
+export const DIAL_COLORS = ["rosa", "celeste"] as const;
 export const SECTION_IDS = ["hero", "skills", "about", "work", "services", "contact"] as const;
 
 const link = z.object({
@@ -69,6 +70,13 @@ const profile = defineCollection({
         note: z.string(),
         backToTop: z.string(),
       }),
+      skyDial: z.object({
+        label: z.string(),
+        night: z.string(),
+        dawn: z.string(),
+        day: z.string(),
+        sunset: z.string(),
+      }),
     }),
 });
 
@@ -76,6 +84,8 @@ const theme = defineCollection({
   loader: glob({ pattern: "theme.json", base: "./src/content/settings" }),
   schema: z.object({
     accent: z.enum(ACCENTS),
+    dialColor: z.enum(DIAL_COLORS),
+    showSkyDial: z.boolean(),
     sections: z.array(
       z.object({
         id: z.enum(SECTION_IDS),

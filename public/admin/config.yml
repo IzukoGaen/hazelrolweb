@@ -127,6 +127,15 @@ collections:
             fields:
               - { name: note, label: Nota, widget: string }
               - { name: backToTop, label: Texto "volver arriba", widget: string }
+          - name: skyDial
+            label: Reloj del cielo (Sky Dial)
+            widget: object
+            fields:
+              - { name: label, label: "Nombre del control (para lectores de pantalla)", widget: string }
+              - { name: night, label: "Noche (20:00–5:00)", widget: string }
+              - { name: dawn, label: "Amanecer (5:00–8:00)", widget: string }
+              - { name: day, label: "Día (8:00–17:00)", widget: string }
+              - { name: sunset, label: "Atardecer (17:00–20:00)", widget: string }
 
       - name: theme
         label: Diseño
@@ -140,6 +149,13 @@ collections:
               - { label: Rosa, value: pink }
               - { label: Amarillo, value: yellow }
               - { label: Lavanda, value: periwinkle }
+          - name: dialColor
+            label: Color del reloj del cielo
+            widget: select
+            options:
+              - { label: Rosa, value: rosa }
+              - { label: Celeste, value: celeste }
+          - { name: showSkyDial, label: Mostrar el reloj del cielo, widget: boolean }
           - name: sections
             label: Secciones (arrastra para reordenar)
             widget: list
