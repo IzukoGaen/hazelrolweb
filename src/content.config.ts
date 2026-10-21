@@ -87,6 +87,8 @@ const theme = defineCollection({
     accent: z.enum(ACCENTS),
     dialColor: z.enum(DIAL_COLORS),
     showSkyDial: z.boolean(),
+    showCat: z.boolean(),
+    catName: z.string().optional(),
     sections: z.array(
       z.object({
         id: z.enum(SECTION_IDS),

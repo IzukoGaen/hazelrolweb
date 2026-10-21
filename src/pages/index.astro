@@ -11,6 +11,7 @@ import Contact from "../components/Contact.astro";
 import Footer from "../components/Footer.astro";
 import SkyDial from "../components/SkyDial.astro";
 import SkyScene from "../components/SkyScene.astro";
+import CatCompanion from "../components/CatCompanion.astro";
 import { visibleSections, type SectionId } from "../lib/sections";
 
 const profileEntry = await getEntry("profile", "profile");
@@ -67,4 +68,5 @@ function componentFor(id: SectionId) {
   </main>
   <Footer profile={profile} />
   {theme.showSkyDial && <SkyDial color={theme.dialColor} labels={profile.skyDial} />}
+  {theme.showCat && <CatCompanion />}
 </BaseLayout>

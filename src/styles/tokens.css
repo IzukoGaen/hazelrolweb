@@ -93,6 +93,28 @@
   --dial-deep: #b5daf3;
 }
 
+/* ---------- Cat companion ---------- */
+
+:root {
+  --cat-fur: #f5a65b;
+  --cat-stripe: #e0843a;
+  --cat-cream: #fff1dc;
+  --cat-outline: #8a5232;
+  --cat-eye: #2e1f17;
+  --cat-shine: #ffffff;
+  --cat-nose: #f08fa3;
+  --cat-ear: #f9bfca;
+  --cat-blush: #f7a4b5;
+  --cat-zzz: #f4f1ff;
+  --cat-size: 48px;
+}
+
+@media (min-width: 720px) {
+  :root {
+    --cat-size: 64px;
+  }
+}
+
 /* ---------- Wax seal (contact confirmation) ---------- */
 
 :root {

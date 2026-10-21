@@ -157,6 +157,8 @@ collections:
               - { label: Rosa, value: rosa }
               - { label: Celeste, value: celeste }
           - { name: showSkyDial, label: Mostrar el reloj del cielo, widget: boolean }
+          - { name: showCat, label: Mostrar el gatito, widget: boolean }
+          - { name: catName, label: Nombre del gatito (aparece al tocarlo), widget: string, required: false }
           - name: sections
             label: Secciones (arrastra para reordenar)
             widget: list
