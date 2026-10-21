@@ -1,99 +1,30 @@
 ---
-// Original chibi orange tabby. Three poses share one 80x64 canvas (ground at
-// y=62); only the active pose is visible and animated.
+import {
+  CAT_FRAMES,
+  CAT_ZZZ,
+  PIXEL_CLASS,
+  SPRITE_HEIGHT,
+  SPRITE_WIDTH,
+  toPaths,
+  type CatFrame,
+} from "../lib/catSprites";
+
+const frames = (Object.keys(CAT_FRAMES) as CatFrame[]).map((name) => ({
+  name,
+  paths: toPaths(CAT_FRAMES[name]),
+}));
 ---
 
 <div class="cat-layer" aria-hidden="true">
-  <div class="cat" data-cat data-pose="sit">
-    <svg viewBox="0 0 80 64">
-      <g class="pose pose-sit">
-        <g class="tail">
-          <path class="tail-o" d="M52 57C64 60 70 50 66 40C64 34 68 30 71 33" />
-          <path class="tail-f" d="M52 57C64 60 70 50 66 40C64 34 68 30 71 33" />
-          <path class="tail-s" d="M52 57C64 60 70 50 66 40C64 34 68 30 71 33" />
+  <div class="cat" data-cat data-pose="sit" data-facing="right">
+    <svg viewBox={`0 0 ${SPRITE_WIDTH} ${SPRITE_HEIGHT}`} shape-rendering="crispEdges">
+      {frames.map(({ name, paths }) => (
+        <g class={`frame frame-${name}`}>
+          {paths.map((p) => <path class={`px-${PIXEL_CLASS[p.key]}`} d={p.d} />)}
         </g>
-        <ellipse class="fur" cx="40" cy="50" rx="15" ry="12.5" />
-        <ellipse class="cream" cx="40" cy="53" rx="8" ry="8" />
-        <ellipse class="cream-o" cx="34" cy="60.5" rx="4.5" ry="3" />
-        <ellipse class="cream-o" cx="46" cy="60.5" rx="4.5" ry="3" />
-        <g class="head">
-          <path class="fur" d="M24 21L25.5 6.5L36.5 13.5Z" />
-          <path class="fur" d="M56 21L54.5 6.5L43.5 13.5Z" />
-          <path class="ear-in" d="M27.5 17L28 10L33 13.5Z" />
-          <path class="ear-in" d="M52.5 17L52 10L47 13.5Z" />
-          <ellipse class="fur" cx="40" cy="28" rx="19" ry="16.5" />
-          <path class="stripe" d="M36 13.5L36.8 18M40 12.5V17.5M44 13.5L43.2 18" />
-          <ellipse class="cream" cx="40" cy="35.5" rx="7.5" ry="4.8" />
-          <ellipse class="blush" cx="29" cy="33.5" rx="3.2" ry="1.9" />
-          <ellipse class="blush" cx="51" cy="33.5" rx="3.2" ry="1.9" />
-          <ellipse class="eye" cx="33" cy="28" rx="3" ry="3.6" />
-          <ellipse class="eye" cx="47" cy="28" rx="3" ry="3.6" />
-          <circle class="shine" cx="34" cy="26.6" r="1.1" />
-          <circle class="shine" cx="48" cy="26.6" r="1.1" />
-          <path class="nose" d="M38.5 32.6H41.5L40 34.3Z" />
-          <path class="line" d="M40 34.3Q38.8 36.2 37.2 35.3M40 34.3Q41.2 36.2 42.8 35.3" />
-        </g>
-      </g>
-
-      <g class="pose pose-walk">
-        <g class="tail">
-          <path class="tail-o" d="M23 44C13 43 9 34 12 25C13 21 17 20 18 23" />
-          <path class="tail-f" d="M23 44C13 43 9 34 12 25C13 21 17 20 18 23" />
-          <path class="tail-s" d="M23 44C13 43 9 34 12 25C13 21 17 20 18 23" />
-        </g>
-        <g class="leg leg-a"><rect class="fur" x="24" y="47" width="6" height="13" rx="3" /><ellipse class="cream-o" cx="27" cy="60" rx="3.4" ry="2.2" /></g>
-        <g class="leg leg-b"><rect class="fur" x="44" y="47" width="6" height="13" rx="3" /><ellipse class="cream-o" cx="47" cy="60" rx="3.4" ry="2.2" /></g>
-        <ellipse class="fur" cx="38" cy="46" rx="17" ry="10" />
-        <ellipse class="cream" cx="40" cy="51" rx="10" ry="3.6" />
-        <path class="stripe" d="M30 37.5L31 41.5M36 36.5L36.5 40.5" />
-        <g class="leg leg-b"><rect class="fur" x="30" y="48" width="6" height="13" rx="3" /><ellipse class="cream-o" cx="33" cy="61" rx="3.4" ry="2.2" /></g>
-        <g class="leg leg-a"><rect class="fur" x="50" y="48" width="6" height="13" rx="3" /><ellipse class="cream-o" cx="53" cy="61" rx="3.4" ry="2.2" /></g>
-        <g class="head">
-          <path class="fur" d="M43 23L45 8.5L54 15.5Z" />
-          <path class="fur" d="M70 23L67.5 8.5L59 15Z" />
-          <path class="ear-in" d="M46.5 19L47.2 12L51.5 15.5Z" />
-          <path class="ear-in" d="M66.5 19L65.6 12L61.5 15.3Z" />
-          <ellipse class="fur" cx="57" cy="29" rx="16" ry="14.5" />
-          <path class="stripe" d="M53.5 15.5L54.2 20M57.5 14.7V19.7M61.5 15.5L60.8 20" />
-          <ellipse class="cream" cx="61" cy="35.5" rx="7" ry="4.5" />
-          <ellipse class="blush" cx="50" cy="34" rx="2.6" ry="1.6" />
-          <ellipse class="blush" cx="70" cy="34" rx="2.4" ry="1.6" />
-          <ellipse class="eye" cx="54.5" cy="28.5" rx="2.8" ry="3.4" />
-          <ellipse class="eye" cx="65" cy="28.5" rx="2.6" ry="3.4" />
-          <circle class="shine" cx="55.4" cy="27.2" r="1" />
-          <circle class="shine" cx="65.8" cy="27.2" r="1" />
-          <path class="nose" d="M59.8 32.7H62.6L61.2 34.3Z" />
-          <path class="line" d="M61.2 34.3Q60.1 36 58.6 35.2M61.2 34.3Q62.3 36 63.8 35.2" />
-        </g>
-      </g>
-
-      <g class="pose pose-sleep">
-        <g class="breath">
-          <ellipse class="fur" cx="38" cy="51" rx="22" ry="11" />
-          <path class="stripe" d="M28 41.5L29 45.5M34 40.5L34.5 44.5M40 40.5V44.5" />
-          <g class="sleep-head">
-            <path class="fur" d="M42 42L42.5 30.5L50 36Z" />
-            <path class="fur" d="M64 41L64.5 29.5L56.5 35Z" />
-            <path class="ear-in" d="M44.5 39L44.8 33.5L48.2 36Z" />
-            <path class="ear-in" d="M61.6 38.5L62 33L58.3 35.4Z" />
-            <ellipse class="fur" cx="53" cy="47" rx="14" ry="11.5" />
-            <path class="stripe" d="M50 36.5L50.6 40M53 36V39.6M56 36.5L55.4 40" />
-            <ellipse class="cream" cx="53.5" cy="52" rx="6" ry="3.8" />
-            <ellipse class="blush" cx="45" cy="50.5" rx="2.6" ry="1.6" />
-            <ellipse class="blush" cx="62" cy="50.5" rx="2.6" ry="1.6" />
-            <path class="line" d="M45.5 46.5Q48 48.8 50.5 46.5M56 46.5Q58.5 48.8 61 46.5" />
-            <path class="nose" d="M52.3 49.6H54.9L53.6 51Z" />
-          </g>
-        </g>
-        <g class="tail">
-          <path class="tail-o" d="M17 53C14 62 34 64 50 61.5" />
-          <path class="tail-f" d="M17 53C14 62 34 64 50 61.5" />
-          <path class="tail-s" d="M17 53C14 62 34 64 50 61.5" />
-        </g>
-        <g transform="translate(66 30)"><path class="z z1" d="M0 0H5L0 6H5" /></g>
-        <g transform="translate(71 21)"><path class="z z2" d="M0 0H4L0 5H4" /></g>
-        <g transform="translate(75 13)"><path class="z z3" d="M0 0H3.5L0 4.2H3.5" /></g>
-      </g>
+      ))}
+      <g class="zzz zzz-big">{CAT_ZZZ.big.map((p) => <path class={`px-${PIXEL_CLASS[p.key]}`} d={p.d} />)}</g>
+      <g class="zzz zzz-small">{CAT_ZZZ.small.map((p) => <path class={`px-${PIXEL_CLASS[p.key]}`} d={p.d} />)}</g>
     </svg>
   </div>
 </div>
@@ -101,70 +32,152 @@
 <script>
   import { SKY_DIAL_EVENT, isNight, type SkyDialChange } from "../lib/skyTime";
 
-  type CatPose = "sit" | "walk" | "sleep";
+  type CatState = "walk" | "sit" | "sleep";
+  type Facing = 1 | -1;
 
-  const ENTRANCE_MS = 2600;
+  const SPEED_PX_PER_S = 34;
+  const EDGE_GAP_PX = 16;
+  const DIAL_GAP_PX = 12;
   const MAX_FRAME_MS = 50;
+  const WALK_MS: [number, number] = [3500, 8000];
+  const SIT_MS: [number, number] = [2500, 6000];
 
   const cat = document.querySelector<HTMLElement>("[data-cat]");
 
   if (cat) {
     const root = document.documentElement;
     const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const between = ([min, max]: [number, number]) => min + Math.random() * (max - min);
+
+    let state: CatState = "sit";
+    let facing: Facing = 1;
+    let x = EDGE_GAP_PX;
+    let timer = 0;
+    let lookAt = -1;
+    let bounds = { min: EDGE_GAP_PX, max: EDGE_GAP_PX };
+
     const preset = root.dataset.skyMinutes;
     const now = new Date();
     let night = isNight(preset !== undefined ? Number(preset) : now.getHours() * 60 + now.getMinutes());
-    let walking = false;
 
-    const setPose = (pose: CatPose) => {
-      cat.dataset.pose = pose;
+    // Walks between the left edge and just before the Sky Dial (or the right edge).
+    const measure = () => {
+      const width = cat.offsetWidth;
+      const dial = document.querySelector<HTMLElement>(".sky-dial");
+      const limit = dial ? dial.getBoundingClientRect().left - DIAL_GAP_PX : innerWidth - EDGE_GAP_PX;
+      bounds = { min: EDGE_GAP_PX, max: Math.max(EDGE_GAP_PX, limit - width) };
     };
-    const rest = () => setPose(night ? "sleep" : "sit");
+
+    const render = () => {
+      cat.style.transform = `translate3d(${Math.round(x)}px, 0, 0)`;
+      cat.dataset.facing = facing === 1 ? "right" : "left";
+    };
+
+    const enter = (next: CatState) => {
+      state = next;
+      cat.dataset.pose = next;
+      switch (next) {
+        case "walk":
+          timer = between(WALK_MS);
+          break;
+        case "sit":
+          timer = between(SIT_MS);
+          lookAt = Math.random() < 0.6 ? timer * (0.3 + Math.random() * 0.4) : -1;
+          break;
+        case "sleep":
+          timer = Infinity;
+          break;
+        default: {
+          const unhandled: never = next;
+          throw new Error(`Unknown cat state: ${unhandled}`);
+        }
+      }
+    };
+
+    const tick = (dt: number) => {
+      const offscreen = x < bounds.min;
+      if (state === "walk") {
+        x += facing * SPEED_PX_PER_S * (dt / 1000);
+        if (x >= bounds.max) {
+          x = bounds.max;
+          facing = -1;
+        } else if (x <= bounds.min && facing === -1) {
+          x = bounds.min;
+          facing = 1;
+        }
+      }
+      timer -= dt;
+      if (state === "sit" && lookAt >= 0 && timer <= lookAt) {
+        facing = facing === 1 ? -1 : 1;
+        lookAt = -1;
+      }
+      if (timer <= 0 && !offscreen) {
+        if (state === "walk") {
+          enter("sit");
+        } else if (state === "sit") {
+          if (x <= bounds.min) facing = 1;
+          else if (x >= bounds.max) facing = -1;
+          else facing = Math.random() < 0.5 ? 1 : -1;
+          enter("walk");
+        }
+      }
+      render();
+    };
+
+    let frame = 0;
+    let last = 0;
+    const loop = (time: number) => {
+      tick(Math.min(time - last, MAX_FRAME_MS));
+      last = time;
+      frame = requestAnimationFrame(loop);
+    };
+    const start = () => {
+      if (reduceMotion || frame) return;
+      last = performance.now();
+      frame = requestAnimationFrame(loop);
+    };
+    const stop = () => {
+      cancelAnimationFrame(frame);
+      frame = 0;
+    };
 
     window.addEventListener(SKY_DIAL_EVENT, (event) => {
       night = isNight((event as CustomEvent<SkyDialChange>).detail.minutes);
-      if (!walking) rest();
+      if (night && state !== "sleep") enter("sleep");
+      else if (!night && state === "sleep") enter("sit");
     });
 
     document.addEventListener("visibilitychange", () => {
       cat.toggleAttribute("data-paused", document.hidden);
+      if (document.hidden) stop();
+      else start();
     });
 
-    // Daytime entrance: trots in from the left edge, then sits. Elapsed time is
-    // clamped per frame, so a hidden tab pauses the walk instead of skipping it.
-    if (!reduceMotion && !night) {
-      walking = true;
-      setPose("walk");
-      const from = -(cat.getBoundingClientRect().right + 16);
-      let elapsed = 0;
-      let last = performance.now();
-      const step = (time: number) => {
-        elapsed += Math.min(time - last, MAX_FRAME_MS);
-        last = time;
-        const t = Math.min(1, elapsed / ENTRANCE_MS);
-        const eased = 1 - (1 - t) * (1 - t);
-        cat.style.transform = `translateX(${(from * (1 - eased)).toFixed(1)}px)`;
-        if (t < 1) {
-          requestAnimationFrame(step);
-          return;
-        }
-        walking = false;
-        rest();
-      };
-      cat.style.transform = `translateX(${from}px)`;
-      requestAnimationFrame(step);
-    } else {
-      rest();
-    }
+    addEventListener("resize", () => {
+      measure();
+      x = Math.min(Math.max(x, bounds.min), bounds.max);
+      render();
+    });
 
-    requestAnimationFrame(() => cat.setAttribute("data-ready", ""));
+    measure();
+    if (night) {
+      enter("sleep");
+    } else if (reduceMotion) {
+      enter("sit");
+    } else {
+      // Daytime entrance: trots in from beyond the left edge.
+      x = -cat.offsetWidth;
+      enter("walk");
+    }
+    render();
+    start();
   }
 </script>
 
 <style>
   .cat-layer {
     position: fixed;
-    left: max(var(--space-3), env(safe-area-inset-left));
+    left: 0;
     bottom: env(safe-area-inset-bottom);
     z-index: 35;
     pointer-events: none;
@@ -172,7 +185,8 @@
 
   .cat {
     height: var(--cat-size);
-    aspect-ratio: 80 / 64;
+    aspect-ratio: 32 / 24;
+    transform: translateX(var(--space-2));
     will-change: transform;
   }
 
@@ -183,196 +197,110 @@
     overflow: visible;
   }
 
-  .pose {
+  .cat[data-facing="left"] svg {
+    transform: scaleX(-1);
+  }
+
+  .px-outline { fill: var(--cat-outline); }
+  .px-fur-light { fill: var(--cat-fur-light); }
+  .px-fur { fill: var(--cat-fur); }
+  .px-fur-dark { fill: var(--cat-fur-dark); }
+  .px-stripe { fill: var(--cat-stripe); }
+  .px-cream { fill: var(--cat-cream); }
+  .px-cream-shade { fill: var(--cat-cream-shade); }
+  .px-eye { fill: var(--cat-eye); }
+  .px-shine { fill: var(--cat-shine); }
+  .px-nose { fill: var(--cat-nose); }
+  .px-ear { fill: var(--cat-ear); }
+  .px-blush { fill: var(--cat-blush); }
+  .px-zzz { fill: var(--cat-zzz); }
+
+  /*
+    Frame-by-frame sprite animation: the first frame of the active pose is
+    visible by default; the others flash in on a stepped opacity cycle.
+  */
+  .frame,
+  .zzz {
     opacity: 0;
   }
 
-  .cat[data-ready] .pose {
-    transition: opacity var(--duration-base) var(--ease-out);
-  }
-
-  .cat[data-pose="sit"] .pose-sit,
-  .cat[data-pose="walk"] .pose-walk,
-  .cat[data-pose="sleep"] .pose-sleep {
+  .cat[data-pose="sit"] .frame-sit-a,
+  .cat[data-pose="walk"] .frame-walk-1,
+  .cat[data-pose="sleep"] .frame-sleep-a {
     opacity: 1;
   }
 
-  .fur {
-    fill: var(--cat-fur);
-    stroke: var(--cat-outline);
-    stroke-width: 1.5;
-    stroke-linejoin: round;
+  .cat[data-pose="sit"] .frame-sit-a {
+    animation: frame-half 1.4s step-end infinite;
   }
 
-  .cream {
-    fill: var(--cat-cream);
+  .cat[data-pose="sit"] .frame-sit-b {
+    animation: frame-half 1.4s step-end -0.7s infinite;
   }
 
-  .cream-o {
-    fill: var(--cat-cream);
-    stroke: var(--cat-outline);
-    stroke-width: 1.3;
+  .cat[data-pose="sit"] .frame-blink {
+    animation: blink 4.6s step-end infinite;
   }
 
-  .stripe {
-    fill: none;
-    stroke: var(--cat-stripe);
-    stroke-width: 2;
-    stroke-linecap: round;
+  .cat[data-pose="walk"] .frame-walk-1 {
+    animation: frame-quarter 0.6s step-end infinite;
   }
 
-  .ear-in {
-    fill: var(--cat-ear);
+  .cat[data-pose="walk"] .frame-walk-2 {
+    animation: frame-quarter 0.6s step-end -0.45s infinite;
   }
 
-  .eye {
-    fill: var(--cat-eye);
+  .cat[data-pose="walk"] .frame-walk-3 {
+    animation: frame-quarter 0.6s step-end -0.3s infinite;
   }
 
-  .shine {
-    fill: var(--cat-shine);
+  .cat[data-pose="walk"] .frame-walk-4 {
+    animation: frame-quarter 0.6s step-end -0.15s infinite;
   }
 
-  .nose {
-    fill: var(--cat-nose);
+  .cat[data-pose="sleep"] .frame-sleep-a {
+    animation: frame-half 3.4s step-end infinite;
   }
 
-  .blush {
-    fill: var(--cat-blush);
-    opacity: 0.75;
+  .cat[data-pose="sleep"] .frame-sleep-b {
+    animation: frame-half 3.4s step-end -1.7s infinite;
   }
 
-  .line {
-    fill: none;
-    stroke: var(--cat-outline);
-    stroke-width: 1.2;
-    stroke-linecap: round;
+  .cat[data-pose="sleep"] .zzz {
+    animation: z-rise 2.8s steps(5, end) infinite;
   }
 
-  .tail-o,
-  .tail-f,
-  .tail-s {
-    fill: none;
+  .cat[data-pose="sleep"] .zzz-small {
+    animation-delay: -1.4s;
   }
 
-  .tail-o {
-    stroke: var(--cat-outline);
-    stroke-width: 8.5;
-    stroke-linecap: round;
+  @keyframes frame-half {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
   }
 
-  .tail-f {
-    stroke: var(--cat-fur);
-    stroke-width: 5.5;
-    stroke-linecap: round;
+  @keyframes frame-quarter {
+    0% { opacity: 1; }
+    25% { opacity: 0; }
   }
 
-  .tail-s {
-    stroke: var(--cat-stripe);
-    stroke-width: 5.5;
-    stroke-dasharray: 2.5 6;
-  }
-
-  .tail,
-  .leg,
-  .breath,
-  .z {
-    transform-box: view-box;
-  }
-
-  .pose-sit .tail {
-    transform-origin: 52px 57px;
-  }
-
-  .pose-walk .tail {
-    transform-origin: 23px 44px;
-  }
-
-  .cat[data-pose="sit"] .pose-sit .tail {
-    animation: tail-sway 2.8s ease-in-out infinite alternate;
-  }
-
-  .cat[data-pose="walk"] .pose-walk .tail {
-    animation: tail-sway 0.9s ease-in-out infinite alternate;
-  }
-
-  @keyframes tail-sway {
-    from {
-      transform: rotate(-7deg);
-    }
-    to {
-      transform: rotate(9deg);
-    }
-  }
-
-  .leg {
-    transform-box: fill-box;
-    transform-origin: 50% 15%;
-  }
-
-  .cat[data-pose="walk"] .leg-a {
-    animation: leg-swing 0.5s ease-in-out infinite alternate;
-  }
-
-  .cat[data-pose="walk"] .leg-b {
-    animation: leg-swing 0.5s ease-in-out infinite alternate-reverse;
-  }
-
-  @keyframes leg-swing {
-    from {
-      transform: rotate(-20deg);
-    }
-    to {
-      transform: rotate(20deg);
-    }
-  }
-
-  .breath {
-    transform-origin: 40px 62px;
-  }
-
-  .cat[data-pose="sleep"] .breath {
-    animation: breathe 3.6s ease-in-out infinite alternate;
-  }
-
-  @keyframes breathe {
-    to {
-      transform: scale(1.015, 1.045);
-    }
-  }
-
-  .z {
-    fill: none;
-    stroke: var(--cat-zzz);
-    stroke-width: 1.5;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    opacity: 0.9;
-  }
-
-  .cat[data-pose="sleep"] .z {
-    animation: z-rise 3s ease-out infinite;
-  }
-
-  .cat[data-pose="sleep"] .z2 {
-    animation-delay: -1s;
-  }
-
-  .cat[data-pose="sleep"] .z3 {
-    animation-delay: -2s;
+  @keyframes blink {
+    0% { opacity: 0; }
+    93% { opacity: 1; }
+    97% { opacity: 0; }
   }
 
   @keyframes z-rise {
     0% {
       opacity: 0;
-      transform: translate(0, 4px);
+      transform: translate(0, 2px);
     }
-    30% {
-      opacity: 0.95;
+    20% {
+      opacity: 1;
     }
     100% {
       opacity: 0;
-      transform: translate(5px, -8px);
+      transform: translate(2px, -5px);
     }
   }
 
@@ -383,6 +311,10 @@
   @media (prefers-reduced-motion: reduce) {
     .cat * {
       animation: none !important;
+    }
+
+    .cat[data-pose="sleep"] .zzz-big {
+      opacity: 1;
     }
   }
 </style>

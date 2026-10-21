@@ -95,23 +95,27 @@
 
 /* ---------- Cat companion ---------- */
 
+/* 16-bit pixel palette; the sprite grid is 24px tall, so sizes stay whole multiples */
 :root {
-  --cat-fur: #f5a65b;
-  --cat-stripe: #e0843a;
-  --cat-cream: #fff1dc;
-  --cat-outline: #8a5232;
-  --cat-eye: #2e1f17;
+  --cat-outline: #5c3320;
+  --cat-fur-light: #ffc27e;
+  --cat-fur: #f5973f;
+  --cat-fur-dark: #d6722c;
+  --cat-stripe: #b95a22;
+  --cat-cream: #fff4e0;
+  --cat-cream-shade: #ecd3b4;
+  --cat-eye: #2a1a12;
   --cat-shine: #ffffff;
-  --cat-nose: #f08fa3;
-  --cat-ear: #f9bfca;
-  --cat-blush: #f7a4b5;
+  --cat-nose: #f0879d;
+  --cat-ear: #f7b3c2;
+  --cat-blush: #f59fb3;
   --cat-zzz: #f4f1ff;
   --cat-size: 48px;
 }
 
 @media (min-width: 720px) {
   :root {
-    --cat-size: 64px;
+    --cat-size: 72px;
   }
 }
 
