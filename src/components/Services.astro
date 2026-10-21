@@ -1,0 +1,153 @@
+---
+import { emphasis } from "../lib/emphasis";
+import type { SectionProps } from "../lib/sections";
+
+type Props = SectionProps;
+
+const { services } = Astro.props.profile;
+---
+
+<section class="services" id="services" aria-labelledby="services-title">
+  <div class="container frame">
+    <div class="grid-row section-head">
+      <h2 class="cell section-title" id="services-title" set:html={emphasis(services.heading)} />
+      <p class="cell small">{services.intro}</p>
+    </div>
+
+    {services.items.length > 0 && (
+      <ol class="service-list">
+        {services.items.map((item, index) => (
+          <li class="service reveal">
+            <span class="label">{String(index + 1).padStart(2, "0")}</span>
+            <h3>{item.title}</h3>
+            <p>{item.description}</p>
+          </li>
+        ))}
+      </ol>
+    )}
+
+    {services.stats.length > 0 && (
+      <div class="grid-row stats" style={`--cols: ${services.stats.length}`}>
+        {services.stats.map((stat) => (
+          <div class="cell stat">
+            <span class="stat-value">{stat.value}</span>
+            <span class="label">{stat.label}</span>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .section-head {
+    align-items: end;
+  }
+
+  .section-head .section-title {
+    padding-top: clamp(var(--space-6), 8vw, var(--space-12));
+  }
+
+  .service-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    border-bottom: var(--border-thin) solid var(--line);
+  }
+
+  .service {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: clamp(var(--space-3), 2.5vw, var(--space-4));
+    transition: background-color var(--duration-base) var(--ease-out);
+  }
+
+  .service + .service {
+    border-top: var(--border-thin) solid var(--line);
+  }
+
+  .service:hover {
+    background: var(--accent-soft);
+  }
+
+  .service h3 {
+    font-size: 1.375rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+
+  .service p {
+    font-size: 0.9375rem;
+    color: var(--ink-soft);
+  }
+
+  .stats {
+    border-bottom: 0;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding-block: clamp(var(--space-4), 5vw, 3.5rem);
+  }
+
+  .stat-value {
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.05em;
+  }
+
+  @media (min-width: 720px) {
+    .section-head {
+      grid-template-columns: 2fr 1fr;
+    }
+
+    .service-list {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .service + .service {
+      border-top: 0;
+    }
+
+    .service:nth-child(even) {
+      border-left: var(--border-thin) solid var(--line);
+    }
+
+    .service:nth-child(n + 3) {
+      border-top: var(--border-thin) solid var(--line);
+    }
+
+    .service {
+      min-height: 16rem;
+    }
+
+    .service .label {
+      margin-bottom: auto;
+    }
+  }
+
+  @media (min-width: 1080px) {
+    .service-list {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .service:nth-child(n + 3) {
+      border-top: 0;
+    }
+
+    .service + .service {
+      border-left: var(--border-thin) solid var(--line);
+    }
+
+    .service:nth-child(4n + 1) {
+      border-left: 0;
+    }
+
+    .service:nth-child(n + 5) {
+      border-top: var(--border-thin) solid var(--line);
+    }
+  }
+</style>

@@ -1,24 +1,66 @@
 ---
-import { getEntry } from "astro:content";
+import { getCollection, getEntry } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Hero from "../components/Hero.astro";
+import Skills from "../components/Skills.astro";
+import About from "../components/About.astro";
+import Work from "../components/Work.astro";
+import Services from "../components/Services.astro";
+import Contact from "../components/Contact.astro";
+import Footer from "../components/Footer.astro";
+import { visibleSections, type SectionId } from "../lib/sections";
 
-const profile = await getEntry("profile", "profile");
-const theme = await getEntry("theme", "theme");
+const profileEntry = await getEntry("profile", "profile");
+const themeEntry = await getEntry("theme", "theme");
 
-if (!profile || !theme) {
+if (!profileEntry || !themeEntry) {
   throw new Error("Missing src/content/settings/profile.json or theme.json");
 }
 
-const { data: p } = profile;
+const profile = profileEntry.data;
+const theme = themeEntry.data;
+const sections = visibleSections(theme);
+const visible = new Set<string>(sections);
+const projects = (await getCollection("projects", ({ data }) => !data.draft)).sort(
+  (a, b) => a.data.order - b.data.order || b.data.year - a.data.year
+);
+
+function componentFor(id: SectionId) {
+  switch (id) {
+    case "hero":
+      return Hero;
+    case "skills":
+      return Skills;
+    case "about":
+      return About;
+    case "work":
+      return Work;
+    case "services":
+      return Services;
+    case "contact":
+      return Contact;
+    default: {
+      const unhandled: never = id;
+      throw new Error(`Unknown section: ${unhandled}`);
+    }
+  }
+}
 ---
 
 <BaseLayout
-  title={p.seo.title}
-  description={p.seo.description}
-  lang={p.language}
-  accent={theme.data.accent}
+  title={profile.seo.title}
+  description={profile.seo.description}
+  lang={profile.language}
+  accent={theme.accent}
+  skipLink={profile.nav.skipLink}
 >
-  <main class="container">
-    <h1>{p.name}</h1>
+  <Header profile={profile} visible={visible} />
+  <main id="main">
+    {sections.map((id) => {
+      const Section = componentFor(id);
+      return <Section profile={profile} projects={projects} visible={visible} />;
+    })}
   </main>
+  <Footer profile={profile} />
 </BaseLayout>

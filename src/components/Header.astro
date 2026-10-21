@@ -1,0 +1,217 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  profile: CollectionEntry<"profile">["data"];
+  visible: Set<string>;
+}
+
+const { profile, visible } = Astro.props;
+
+const links = [
+  { id: "work", label: profile.nav.work },
+  { id: "about", label: profile.nav.about },
+  { id: "services", label: profile.nav.services },
+  { id: "contact", label: profile.nav.contact },
+].filter((link) => visible.has(link.id));
+---
+
+<header class="site-header" id="top">
+  <div class="container header-grid">
+    <a class="wordmark" href="#top">{profile.name}</a>
+    <nav class="nav" id="site-nav" aria-label={profile.nav.menu}>
+      {links.map((link) => <a href={`#${link.id}`}>{link.label}</a>)}
+    </nav>
+    {visible.has("contact") && (
+      <a class="header-cta" href="#contact">
+        {profile.nav.cta} <span aria-hidden="true">→</span>
+      </a>
+    )}
+    <button class="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label={profile.nav.menu}>
+      <span class="nav-toggle-bar" aria-hidden="true"></span>
+      <span class="nav-toggle-bar" aria-hidden="true"></span>
+    </button>
+  </div>
+</header>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>(".nav-toggle");
+  const nav = document.getElementById("site-nav");
+
+  if (toggle && nav) {
+    const setOpen = (open: boolean) => {
+      toggle.setAttribute("aria-expanded", String(open));
+      nav.classList.toggle("is-open", open);
+    };
+
+    toggle.addEventListener("click", () => {
+      setOpen(toggle.getAttribute("aria-expanded") !== "true");
+    });
+
+    nav.addEventListener("click", (event) => {
+      if ((event.target as HTMLElement).closest("a")) setOpen(false);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && nav.classList.contains("is-open")) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+  }
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--header-bg);
+    backdrop-filter: blur(10px);
+    border-bottom: var(--border-thin) solid var(--line);
+  }
+
+  .header-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--space-8);
+  }
+
+  .wordmark {
+    font-weight: 600;
+    font-size: 1.125rem;
+    letter-spacing: -0.02em;
+  }
+
+  .header-cta {
+    display: none;
+  }
+
+  .nav-toggle {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    width: 44px;
+    height: 44px;
+    padding: 0 10px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .nav-toggle-bar {
+    display: block;
+    height: 1.5px;
+    background: var(--ink);
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+
+  .nav-toggle[aria-expanded="true"] .nav-toggle-bar:first-child {
+    transform: translateY(3.75px) rotate(45deg);
+  }
+
+  .nav-toggle[aria-expanded="true"] .nav-toggle-bar:last-child {
+    transform: translateY(-3.75px) rotate(-45deg);
+  }
+
+  .nav {
+    position: absolute;
+    top: 100%;
+    left: calc(-1 * var(--gutter));
+    right: calc(-1 * var(--gutter));
+    display: none;
+    flex-direction: column;
+    padding: var(--space-1) var(--gutter) var(--space-3);
+    background: var(--paper);
+    border-bottom: var(--border-thin) solid var(--line);
+    font-size: var(--text-lg);
+    font-weight: 500;
+  }
+
+  .nav.is-open {
+    display: flex;
+  }
+
+  .nav a {
+    padding-block: 0.75rem;
+    border-bottom: var(--border-thin) solid var(--line);
+  }
+
+  @media (min-width: 720px) {
+    .header-grid {
+      grid-template-columns: 1fr auto 1fr;
+    }
+
+    .nav-toggle {
+      display: none;
+    }
+
+    .nav {
+      position: static;
+      display: flex;
+      flex-direction: row;
+      gap: clamp(var(--space-2), 3vw, 2.5rem);
+      padding: 0;
+      background: none;
+      border: 0;
+      font-size: var(--text-sm);
+    }
+
+    .nav a {
+      position: relative;
+      padding-block: var(--space-1);
+      border: 0;
+    }
+
+    .nav a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0.25rem;
+      width: 100%;
+      height: var(--border-thin);
+      background: currentColor;
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform var(--duration-base) var(--ease-out);
+    }
+
+    .nav a:hover::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+
+    .header-cta {
+      justify-self: end;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4em;
+      min-height: 2.5rem;
+      padding: 0.4rem 1rem;
+      border: var(--border-thick) solid var(--outline);
+      border-radius: var(--radius-pill);
+      background: var(--accent);
+      color: var(--on-accent);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      box-shadow: var(--shadow-hard-sm);
+      transition:
+        transform var(--duration-fast) var(--ease-out),
+        box-shadow var(--duration-fast) var(--ease-out);
+    }
+
+    .header-cta:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-hard-md);
+    }
+
+    .header-cta:active {
+      transform: translate(2px, 2px);
+      box-shadow: none;
+    }
+  }
+</style>

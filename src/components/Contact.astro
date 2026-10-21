@@ -1,0 +1,95 @@
+---
+import { emphasis } from "../lib/emphasis";
+import type { SectionProps } from "../lib/sections";
+
+type Props = SectionProps;
+
+const { contact } = Astro.props.profile;
+---
+
+<section class="contact" id="contact" aria-labelledby="contact-title">
+  <div class="container frame">
+    <div class="contact-inner">
+      <h2 class="contact-title reveal" id="contact-title" set:html={emphasis(contact.heading)} />
+      <a class="button" href={`mailto:${contact.email}`}>
+        {contact.email} <span aria-hidden="true">→</span>
+      </a>
+      <ul class="links">
+        {contact.socials.map((social) => (
+          <li>
+            <a class="link-arrow" href={social.url} target="_blank" rel="noopener">
+              {social.label} <span aria-hidden="true">↗</span>
+            </a>
+          </li>
+        ))}
+        {contact.cv && (
+          <li>
+            <a class="link-arrow" href={contact.cv} download>
+              {contact.cvLabel} <span aria-hidden="true">↓</span>
+            </a>
+          </li>
+        )}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    text-align: center;
+    padding: clamp(var(--space-8), 12vw, 9rem) var(--gutter);
+    background:
+      radial-gradient(ellipse at 30% 120%, var(--highlight), transparent 55%),
+      radial-gradient(ellipse at 75% 120%, var(--accent), transparent 60%),
+      var(--surface);
+  }
+
+  .contact-title {
+    font-size: clamp(2.25rem, 6.5vw, 5.75rem);
+    font-weight: 500;
+    line-height: 0.98;
+    letter-spacing: var(--tracking-tight);
+    max-width: 16ch;
+  }
+
+  .button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 3rem;
+    padding: 0.875rem 1.75rem;
+    border: var(--border-thick) solid var(--outline);
+    border-radius: var(--radius-pill);
+    background: var(--accent);
+    color: var(--on-accent);
+    font-weight: 600;
+    box-shadow: var(--shadow-hard);
+    overflow-wrap: anywhere;
+    transition:
+      transform var(--duration-fast) var(--ease-out),
+      box-shadow var(--duration-fast) var(--ease-out);
+  }
+
+  .button:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-hard-lg);
+  }
+
+  .button:active {
+    transform: translate(3px, 3px);
+    box-shadow: none;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+    font-weight: 500;
+  }
+</style>

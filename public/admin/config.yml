@@ -44,6 +44,8 @@ collections:
               - { name: services, label: Servicios, widget: string }
               - { name: contact, label: Contacto, widget: string }
               - { name: cta, label: Botón del menú, widget: string }
+              - { name: menu, label: "Nombre del menú (para lectores de pantalla)", widget: string }
+              - { name: skipLink, label: "Enlace «saltar al contenido» (para teclado)", widget: string }
           - name: hero
             label: Portada
             widget: object

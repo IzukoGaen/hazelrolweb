@@ -1,0 +1,134 @@
+---
+import { Image } from "astro:assets";
+import { emphasis } from "../lib/emphasis";
+import type { SectionProps } from "../lib/sections";
+
+type Props = SectionProps;
+
+const { about } = Astro.props.profile;
+---
+
+<section class="about" id="about" aria-labelledby="about-title">
+  <div class="container frame">
+    <div class="grid-row about-grid">
+      <div class="cell about-meta">
+        <h2 class="label" id="about-title">{about.heading}</h2>
+        {about.facts.length > 0 && (
+          <dl class="facts">
+            {about.facts.map((fact) => (
+              <div>
+                <dt>{fact.label}</dt>
+                <dd>{fact.value}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+      </div>
+
+      <div class="cell about-body">
+        <p class="lead reveal" set:html={emphasis(about.lead)} />
+        <div class="paragraphs">
+          {about.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+        </div>
+      </div>
+
+      <div class="cell about-portrait">
+        {about.portrait ? (
+          <Image
+            class="portrait"
+            src={about.portrait}
+            alt={about.portraitAlt ?? ""}
+            widths={[320, 480, 720]}
+            sizes="(min-width: 960px) 25vw, 100vw"
+          />
+        ) : (
+          <div class="portrait portrait-placeholder" aria-hidden="true"></div>
+        )}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .facts {
+    display: grid;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+  }
+
+  .facts dt {
+    font-size: var(--text-xs);
+    color: var(--ink-soft);
+  }
+
+  .facts dd {
+    font-weight: 500;
+  }
+
+  .about-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding-block: clamp(var(--space-4), 6vw, 5rem);
+  }
+
+  .lead {
+    font-size: var(--text-lg);
+    font-weight: 500;
+    line-height: var(--leading-snug);
+    letter-spacing: -0.025em;
+    max-width: 26ch;
+  }
+
+  .paragraphs {
+    display: grid;
+    gap: var(--space-3);
+    font-size: 0.9375rem;
+    color: var(--ink-soft);
+  }
+
+  .about-portrait {
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .portrait {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border: var(--border-thick) solid var(--outline);
+    box-shadow: var(--shadow-hard);
+  }
+
+  .portrait-placeholder {
+    background: linear-gradient(160deg, var(--accent-soft), var(--accent) 60%, var(--highlight));
+  }
+
+  @media (min-width: 720px) {
+    .paragraphs {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (min-width: 720px) and (max-width: 959px) {
+    .about-grid {
+      grid-template-columns: 1fr 2fr;
+    }
+
+    .about-grid .about-portrait {
+      grid-column: 1 / -1;
+      border-left: 0;
+      border-top: var(--border-thin) solid var(--line);
+    }
+
+    .portrait {
+      max-width: 22rem;
+    }
+  }
+
+  @media (min-width: 960px) {
+    .about-grid {
+      grid-template-columns: 1fr 2fr 1fr;
+    }
+  }
+</style>

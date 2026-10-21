@@ -15,6 +15,9 @@
   --ink-soft: #4d5b74;
   --line: rgba(29, 42, 68, 0.12);
   --outline: #1d2a44;
+  --success: #2f9e5b;
+  --success-ring: rgba(47, 158, 91, 0.18);
+  --header-bg: rgba(246, 249, 252, 0.85);
 
   /* Typography */
   --font-sans: "General Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -54,8 +57,11 @@
 
   /* Playful accents: hard offset shadows, never blurred */
   --shadow-hard-sm: 3px 3px 0 var(--outline);
+  --shadow-hard-md: 5px 5px 0 var(--outline);
   --shadow-hard: 6px 6px 0 var(--outline);
+  --shadow-hard-lg: 9px 9px 0 var(--outline);
   --shadow-hard-accent: 6px 6px 0 var(--accent);
+  --shadow-status: 0 0 0 4px var(--success-ring);
 
   /* Motion */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
@@ -73,6 +79,8 @@
   --accent-text: #2f6fa8;
   --on-accent: #1d2a44;
   --highlight: #f6b3c8;
+  --hero-from: #a9d8f5;
+  --hero-to: #eaf6fd;
 }
 
 [data-accent="pink"] {
@@ -81,6 +89,8 @@
   --accent-text: #b0306a;
   --on-accent: #1d2a44;
   --highlight: #a9d8f5;
+  --hero-from: #f6b3c8;
+  --hero-to: #fdeef3;
 }
 
 [data-accent="yellow"] {
@@ -89,6 +99,8 @@
   --accent-text: #8a6100;
   --on-accent: #1d2a44;
   --highlight: #f6b3c8;
+  --hero-from: #ffd95a;
+  --hero-to: #fff8de;
 }
 
 [data-accent="periwinkle"] {
@@ -97,4 +109,6 @@
   --accent-text: #4a46b8;
   --on-accent: #1d2a44;
   --highlight: #ffd95a;
+  --hero-from: #b8b9f5;
+  --hero-to: #f0f0fe;
 }

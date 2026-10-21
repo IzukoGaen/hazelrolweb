@@ -63,9 +63,121 @@ img {
   white-space: nowrap;
 }
 
+em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--accent-text);
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--space-2);
+  top: calc(-1 * var(--space-8));
+  z-index: 100;
+  padding: var(--space-1) var(--space-2);
+  background: var(--ink);
+  color: var(--surface);
+}
+
+.skip-link:focus {
+  top: var(--space-2);
+}
+
 .container {
   width: min(100% - 2 * var(--gutter), var(--max-width));
   margin-inline: auto;
+}
+
+/* Editorial grid: framed column with thin dividers between cells */
+
+.frame {
+  border-inline: var(--border-thin) solid var(--line);
+  border-bottom: var(--border-thin) solid var(--line);
+  background: var(--surface);
+}
+
+.grid-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  border-bottom: var(--border-thin) solid var(--line);
+}
+
+.cell {
+  padding: clamp(var(--space-2), 2vw, var(--space-3));
+}
+
+.cell + .cell {
+  border-top: var(--border-thin) solid var(--line);
+}
+
+@media (min-width: 720px) {
+  .grid-row {
+    grid-template-columns: repeat(var(--cols, 3), 1fr);
+  }
+
+  .cell + .cell {
+    border-top: 0;
+    border-left: var(--border-thin) solid var(--line);
+  }
+}
+
+.label {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.small {
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+  max-width: 34ch;
+}
+
+.link-arrow {
+  display: inline-flex;
+  gap: 0.4em;
+  align-items: center;
+  border-bottom: var(--border-thin) solid currentColor;
+  padding-bottom: 2px;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.link-arrow span {
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.link-arrow:hover {
+  color: var(--accent-text);
+}
+
+.link-arrow:hover span {
+  transform: translateX(3px);
+}
+
+.section-title {
+  font-size: var(--text-2xl);
+  font-weight: 500;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+}
+
+/* Scroll reveal: only hides content once JS has confirmed it can reveal it */
+
+.js .reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity var(--duration-slow) var(--ease-out),
+    transform var(--duration-slow) var(--ease-out);
+}
+
+.js .reveal.is-visible {
+  opacity: 1;
+  transform: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -79,5 +191,10 @@ img {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .js .reveal {
+    opacity: 1;
+    transform: none;
   }
 }
