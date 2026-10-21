@@ -34,6 +34,8 @@ const { title, description, lang, accent, skipLink } = Astro.props;
     <a class="skip-link" href="#main">{skipLink}</a>
     <slot />
     <script>
+      import "../scripts/pressable";
+
       if (document.documentElement.classList.contains("js")) {
         const observer = new IntersectionObserver(
           (entries) => {

@@ -63,6 +63,13 @@
   --shadow-hard-accent: 6px 6px 0 var(--accent);
   --shadow-status: 0 0 0 4px var(--success-ring);
 
+  /* Pressable buttons: the hard shadow is a layer the face travels onto */
+  --press-offset: 4px;
+  --press-lift: 1px;
+  --press-in: 60ms;
+  --press-out: 340ms;
+  --ease-spring: cubic-bezier(0.34, 1.8, 0.64, 1);
+
   /* Motion */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --duration-fast: 200ms;
