@@ -21,6 +21,12 @@ export const PIXEL_CLASS = {
   p: "ear",
   b: "blush",
   z: "zzz",
+  T: "tent-fabric",
+  t: "tent-shade",
+  S: "tent-stripe",
+  D: "tent-door",
+  g: "tent-flag",
+  y: "tent-eye",
 } as const;
 
 export type PixelKey = keyof typeof PIXEL_CLASS;
@@ -224,4 +230,88 @@ export type CatFrame = keyof typeof CAT_FRAMES;
 export const CAT_ZZZ = {
   big: toPaths(Z_BIG, 26, 2),
   small: toPaths(Z_SMALL, 30, -2),
+};
+
+// ---------- Long-haired variant ----------
+
+const FUR_PIXELS = new Set(["F", "f", "d", "s", "c", "C"]);
+const NEIGHBOURS = [
+  [1, 0],
+  [-1, 0],
+  [0, 1],
+  [0, -1],
+] as const;
+
+/**
+ * Pushes the silhouette out by one pixel at scattered spots along the outline,
+ * which reads as fuzzy tufts. Rows from `groundRow` down stay clean so the paws
+ * still sit flat on the floor.
+ */
+export function fluff(grid: readonly string[], groundRow = 20): string[] {
+  const out = grid.map((row) => [...row]);
+  for (let y = 0; y < groundRow; y++) {
+    for (let x = 0; x < SPRITE_WIDTH; x++) {
+      if (grid[y][x] !== "." || (x * 7 + y * 11) % 3 !== 0) continue;
+      for (const [dx, dy] of NEIGHBOURS) {
+        const edge = grid[y + dy]?.[x + dx];
+        const inner = grid[y + 2 * dy]?.[x + 2 * dx];
+        if (edge !== "o" || inner === undefined || !FUR_PIXELS.has(inner)) continue;
+        // The edge pixel turns into fur, so it must stay enclosed on every other side.
+        const exposed = NEIGHBOURS.some(
+          ([ex, ey]) => !(ex === -dx && ey === -dy) && (grid[y + dy + ey]?.[x + dx + ex] ?? ".") === "."
+        );
+        if (exposed) continue;
+        out[y][x] = "o";
+        out[y + dy][x + dx] = inner;
+        break;
+      }
+    }
+  }
+  return out.map((row) => row.join(""));
+}
+
+export const FLUFFY_FRAMES = Object.fromEntries(
+  (Object.keys(CAT_FRAMES) as CatFrame[]).map((name) => [name, name === "blink" ? CAT_FRAMES[name] : fluff(CAT_FRAMES[name])])
+) as Record<CatFrame, string[]>;
+
+// ---------- Tent ----------
+
+/** Little A-frame tent with a pennant, generated so the slopes stay even. */
+function buildTent(): string[] {
+  const grid = Array.from({ length: SPRITE_HEIGHT }, () => Array<string>(SPRITE_WIDTH).fill("."));
+  grid[0][15] = "o";
+  grid[1][15] = "o";
+  for (const x of [16, 17, 18]) grid[0][x] = "g";
+  for (const x of [16, 17]) grid[1][x] = "g";
+
+  for (let y = 2; y <= 22; y++) {
+    const half = Math.round((y - 2) * 0.68);
+    const left = 15 - half;
+    const right = 16 + half;
+    const doorHalf = y >= 9 ? Math.round((y - 9) * 0.42) : -1;
+    const doorLeft = 15 - doorHalf;
+    const doorRight = 16 + doorHalf;
+    for (let x = left; x <= right; x++) {
+      if (x === left || x === right) grid[y][x] = "o";
+      else if (doorHalf >= 0 && (x === doorLeft || x === doorRight)) grid[y][x] = "o";
+      else if (doorHalf >= 0 && x > doorLeft && x < doorRight) grid[y][x] = "D";
+      else if (half >= 4 && (x === left + 2 || x === right - 2)) grid[y][x] = "S";
+      else grid[y][x] = x > 15 ? "t" : "T";
+    }
+  }
+  for (let x = 0; x <= 31; x++) grid[23][x] = x >= 1 && x <= 30 ? "o" : ".";
+  return grid.map((row) => row.join(""));
+}
+
+export const TENT = buildTent();
+
+/** Glowing eyes in the dark doorway while the cat hides inside. */
+export const TENT_EYES = compose([{ rows: ["yy..yy", "yy..yy"], x: 13, y: 17 }]);
+
+/** The cat's head poking out of the doorway. */
+export const TENT_PEEK = compose([{ rows: HEAD, x: 6, y: 11 }]);
+
+export const TENT_ZZZ = {
+  big: toPaths(Z_BIG, 21, 4),
+  small: toPaths(Z_SMALL, 25, 0),
 };

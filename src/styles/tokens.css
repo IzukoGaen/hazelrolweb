@@ -111,6 +111,20 @@
   --cat-blush: #f59fb3;
   --cat-zzz: #f4f1ff;
   --cat-size: 48px;
+
+  /* Long-haired cat: a softer, creamier orange so the three cats read apart */
+  --cat-fluffy-fur-light: #ffd8a6;
+  --cat-fluffy-fur: #f8b062;
+  --cat-fluffy-fur-dark: #e08a3c;
+  --cat-fluffy-stripe: #c97434;
+
+  /* The tent cat's little tent */
+  --tent-fabric: #f9c6d4;
+  --tent-shade: #eaa5ba;
+  --tent-stripe: #fff4e0;
+  --tent-door: #3a2a3f;
+  --tent-flag: #a9d8f5;
+  --tent-eye: #ffe27a;
 }
 
 @media (min-width: 720px) {
