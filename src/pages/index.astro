@@ -12,6 +12,7 @@ import Footer from "../components/Footer.astro";
 import SkyDial from "../components/SkyDial.astro";
 import SkyScene from "../components/SkyScene.astro";
 import CatCompanion from "../components/CatCompanion.astro";
+import SeoHead from "../components/SeoHead.astro";
 import { visibleSections, type SectionId } from "../lib/sections";
 
 const profileEntry = await getEntry("profile", "profile");
@@ -58,6 +59,7 @@ function componentFor(id: SectionId) {
   accent={theme.accent}
   skipLink={profile.nav.skipLink}
 >
+  <SeoHead slot="head" profile={profile} />
   {theme.showSkyDial && <SkyScene slot="backdrop" />}
   <Header profile={profile} visible={visible} />
   <main id="main">
