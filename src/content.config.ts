@@ -65,6 +65,7 @@ const profile = defineCollection({
         socials: z.array(link),
         cv: z.string().optional(),
         cvLabel: z.string(),
+        sealMessage: z.string(),
       }),
       footer: z.object({
         note: z.string(),
@@ -86,6 +87,8 @@ const theme = defineCollection({
     accent: z.enum(ACCENTS),
     dialColor: z.enum(DIAL_COLORS),
     showSkyDial: z.boolean(),
+    showCat: z.boolean(),
+    catName: z.string().optional(),
     sections: z.array(
       z.object({
         id: z.enum(SECTION_IDS),

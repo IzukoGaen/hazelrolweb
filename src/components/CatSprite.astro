@@ -1,0 +1,170 @@
+---
+import {
+  CAT_FRAMES,
+  CAT_ZZZ,
+  FLUFFY_FRAMES,
+  PIXEL_CLASS,
+  SPRITE_HEIGHT,
+  SPRITE_WIDTH,
+  toPaths,
+  type CatFrame,
+} from "../lib/catSprites";
+
+export type CatCoat = "short" | "fluffy";
+export type CatRole = "roam" | "tent";
+
+interface Props {
+  coat: CatCoat;
+  role: CatRole;
+}
+
+const { coat, role } = Astro.props;
+const source = coat === "fluffy" ? FLUFFY_FRAMES : CAT_FRAMES;
+const frames = (Object.keys(source) as CatFrame[]).map((name) => ({ name, paths: toPaths(source[name]) }));
+---
+
+<div class="cat" data-cat={role} data-coat={coat} data-pose={role === "tent" ? "away" : "sit"} data-facing="right">
+  <svg viewBox={`0 0 ${SPRITE_WIDTH} ${SPRITE_HEIGHT}`} shape-rendering="crispEdges">
+    {frames.map(({ name, paths }) => (
+      <g class={`frame frame-${name}`}>
+        {paths.map((p) => <path class={`px-${PIXEL_CLASS[p.key]}`} d={p.d} />)}
+      </g>
+    ))}
+    <g class="zzz zzz-big">{CAT_ZZZ.big.map((p) => <path class={`px-${PIXEL_CLASS[p.key]}`} d={p.d} />)}</g>
+    <g class="zzz zzz-small">{CAT_ZZZ.small.map((p) => <path class={`px-${PIXEL_CLASS[p.key]}`} d={p.d} />)}</g>
+  </svg>
+</div>
+
+<style>
+  .cat {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: var(--cat-size);
+    aspect-ratio: 32 / 24;
+    transform: translateX(var(--space-2));
+    will-change: transform;
+  }
+
+  .cat[data-coat="fluffy"] {
+    --cat-fur-light: var(--cat-fluffy-fur-light);
+    --cat-fur: var(--cat-fluffy-fur);
+    --cat-fur-dark: var(--cat-fluffy-fur-dark);
+    --cat-stripe: var(--cat-fluffy-stripe);
+  }
+
+  .cat svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .cat[data-facing="left"] svg {
+    transform: scaleX(-1);
+  }
+
+  /*
+    Frame-by-frame sprite animation: the first frame of the active pose is
+    visible by default; the others flash in on a stepped opacity cycle.
+    data-pose="away" (tent cat inside its tent) matches no frame, so it hides.
+  */
+  .frame,
+  .zzz {
+    opacity: 0;
+  }
+
+  .cat[data-pose="sit"] .frame-sit-a,
+  .cat[data-pose="walk"] .frame-walk-1,
+  .cat[data-pose="sleep"] .frame-sleep-a {
+    opacity: 1;
+  }
+
+  .cat[data-pose="sit"] .frame-sit-a {
+    animation: frame-half 1.4s step-end infinite;
+  }
+
+  .cat[data-pose="sit"] .frame-sit-b {
+    animation: frame-half 1.4s step-end -0.7s infinite;
+  }
+
+  .cat[data-pose="sit"] .frame-blink {
+    animation: blink 4.6s step-end infinite;
+  }
+
+  .cat[data-pose="walk"] .frame-walk-1 {
+    animation: frame-quarter 0.6s step-end infinite;
+  }
+
+  .cat[data-pose="walk"] .frame-walk-2 {
+    animation: frame-quarter 0.6s step-end -0.45s infinite;
+  }
+
+  .cat[data-pose="walk"] .frame-walk-3 {
+    animation: frame-quarter 0.6s step-end -0.3s infinite;
+  }
+
+  .cat[data-pose="walk"] .frame-walk-4 {
+    animation: frame-quarter 0.6s step-end -0.15s infinite;
+  }
+
+  .cat[data-pose="sleep"] .frame-sleep-a {
+    animation: frame-half 3.4s step-end infinite;
+  }
+
+  .cat[data-pose="sleep"] .frame-sleep-b {
+    animation: frame-half 3.4s step-end -1.7s infinite;
+  }
+
+  .cat[data-pose="sleep"] .zzz {
+    animation: z-rise 2.8s steps(5, end) infinite;
+  }
+
+  .cat[data-pose="sleep"] .zzz-small {
+    animation-delay: -1.4s;
+  }
+
+  @keyframes frame-half {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  @keyframes frame-quarter {
+    0% { opacity: 1; }
+    25% { opacity: 0; }
+  }
+
+  @keyframes blink {
+    0% { opacity: 0; }
+    93% { opacity: 1; }
+    97% { opacity: 0; }
+  }
+
+  @keyframes z-rise {
+    0% {
+      opacity: 0;
+      transform: translate(0, 2px);
+    }
+    20% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(2px, -5px);
+    }
+  }
+
+  .cat[data-paused] * {
+    animation-play-state: paused !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cat * {
+      animation: none !important;
+    }
+
+    .cat[data-pose="sleep"] .zzz-big {
+      opacity: 1;
+    }
+  }
+</style>

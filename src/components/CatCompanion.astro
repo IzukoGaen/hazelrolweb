@@ -1,0 +1,450 @@
+---
+import CatSprite from "./CatSprite.astro";
+import { PIXEL_CLASS, SPRITE_HEIGHT, SPRITE_WIDTH, TENT, TENT_EYES, TENT_PEEK, TENT_ZZZ, toPaths } from "../lib/catSprites";
+
+const layers = [
+  { name: "body", paths: toPaths(TENT) },
+  { name: "eyes", paths: toPaths(TENT_EYES) },
+  { name: "peek", paths: toPaths(TENT_PEEK) },
+];
+---
+
+<div class="cat-layer" aria-hidden="true">
+  <div class="tent" data-tent data-look="eyes">
+    <svg viewBox={`0 0 ${SPRITE_WIDTH} ${SPRITE_HEIGHT}`} shape-rendering="crispEdges">
+      {layers.map(({ name, paths }) => (
+        <g class={`tent-${name}`}>{paths.map((p) => <path class={`px-${PIXEL_CLASS[p.key]}`} d={p.d} />)}</g>
+      ))}
+      <g class="tent-zzz">{TENT_ZZZ.big.map((p) => <path class={`px-${PIXEL_CLASS[p.key]}`} d={p.d} />)}</g>
+      <g class="tent-zzz tent-zzz-small">{TENT_ZZZ.small.map((p) => <path class={`px-${PIXEL_CLASS[p.key]}`} d={p.d} />)}</g>
+    </svg>
+  </div>
+  <CatSprite coat="short" role="tent" />
+  <CatSprite coat="fluffy" role="roam" />
+  <CatSprite coat="short" role="roam" />
+</div>
+
+<script>
+  import { SKY_DIAL_EVENT, isNight, type SkyDialChange } from "../lib/skyTime";
+
+  type Facing = 1 | -1;
+  type Pose = "walk" | "sit" | "sleep" | "away";
+  type RoamState = "walk" | "sit" | "sleep";
+  type TentState = "inside" | "peek" | "out" | "lounge" | "home" | "sleep";
+  type TentLook = "eyes" | "peek" | "empty" | "sleep";
+  type Range = [number, number];
+
+  interface Sprite {
+    el: HTMLElement;
+    x: number;
+    facing: Facing;
+  }
+
+  interface Actor {
+    tick(dt: number): void;
+    setNight(night: boolean): void;
+    clamp(): void;
+  }
+
+  interface RoamerOptions {
+    speed: number;
+    walkMs: Range;
+    sitMs: Range;
+    /** Fraction of the walkable range where the cat starts. */
+    start: number;
+    entrance: boolean;
+  }
+
+  const EDGE_GAP_PX = 16;
+  const DIAL_GAP_PX = 12;
+  const MAX_FRAME_MS = 50;
+
+  const layer = document.querySelector<HTMLElement>(".cat-layer");
+  const tent = layer?.querySelector<HTMLElement>("[data-tent]");
+  const tentCat = layer?.querySelector<HTMLElement>('[data-cat="tent"]');
+  const roamers = [...(layer?.querySelectorAll<HTMLElement>('[data-cat="roam"]') ?? [])];
+
+  if (layer && tent && tentCat) {
+    const root = document.documentElement;
+    const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const between = ([min, max]: Range) => min + Math.random() * (max - min);
+    const randomFacing = (): Facing => (Math.random() < 0.5 ? 1 : -1);
+
+    const preset = root.dataset.skyMinutes;
+    const now = new Date();
+    let night = isNight(preset !== undefined ? Number(preset) : now.getHours() * 60 + now.getMinutes());
+
+    // Everyone walks between the left edge and just before the Sky Dial.
+    let bounds = { min: EDGE_GAP_PX, max: EDGE_GAP_PX };
+    const measure = () => {
+      const width = tentCat.offsetWidth;
+      const dial = document.querySelector<HTMLElement>(".sky-dial");
+      const limit = dial ? dial.getBoundingClientRect().left - DIAL_GAP_PX : innerWidth - EDGE_GAP_PX;
+      bounds = { min: EDGE_GAP_PX, max: Math.max(EDGE_GAP_PX, limit - width) };
+      tent.style.transform = `translate3d(${bounds.min}px, 0, 0)`;
+    };
+    const within = (fraction: number) => bounds.min + (bounds.max - bounds.min) * fraction;
+
+    const place = (sprite: Sprite) => {
+      sprite.el.style.transform = `translate3d(${Math.round(sprite.x)}px, 0, 0)`;
+      sprite.el.dataset.facing = sprite.facing === 1 ? "right" : "left";
+    };
+    const setPose = (sprite: Sprite, pose: Pose) => {
+      sprite.el.dataset.pose = pose;
+    };
+
+    function createRoamer(el: HTMLElement, options: RoamerOptions): Actor {
+      const sprite: Sprite = { el, x: within(options.start), facing: 1 };
+      let state: RoamState = "sit";
+      let timer = 0;
+      let lookAt = -1;
+
+      const enter = (next: RoamState) => {
+        state = next;
+        setPose(sprite, next);
+        switch (next) {
+          case "walk":
+            timer = between(options.walkMs);
+            break;
+          case "sit":
+            timer = between(options.sitMs);
+            lookAt = Math.random() < 0.6 ? timer * (0.3 + Math.random() * 0.4) : -1;
+            break;
+          case "sleep":
+            timer = Infinity;
+            break;
+          default: {
+            const unhandled: never = next;
+            throw new Error(`Unknown cat state: ${unhandled}`);
+          }
+        }
+      };
+
+      const tick = (dt: number) => {
+        const offscreen = sprite.x < bounds.min;
+        if (state === "walk") {
+          sprite.x += sprite.facing * options.speed * (dt / 1000);
+          if (sprite.x >= bounds.max) {
+            sprite.x = bounds.max;
+            sprite.facing = -1;
+          } else if (sprite.x <= bounds.min && sprite.facing === -1) {
+            sprite.x = bounds.min;
+            sprite.facing = 1;
+          }
+        }
+        timer -= dt;
+        if (state === "sit" && lookAt >= 0 && timer <= lookAt) {
+          sprite.facing = sprite.facing === 1 ? -1 : 1;
+          lookAt = -1;
+        }
+        if (timer <= 0 && !offscreen) {
+          if (state === "walk") {
+            enter("sit");
+          } else if (state === "sit") {
+            if (sprite.x <= bounds.min) sprite.facing = 1;
+            else if (sprite.x >= bounds.max) sprite.facing = -1;
+            else sprite.facing = randomFacing();
+            enter("walk");
+          }
+        }
+        place(sprite);
+      };
+
+      if (night) {
+        enter("sleep");
+      } else if (options.entrance && !reduceMotion) {
+        sprite.x = -el.offsetWidth;
+        enter("walk");
+      } else {
+        sprite.facing = randomFacing();
+        enter("sit");
+      }
+      place(sprite);
+
+      return {
+        tick,
+        setNight(isNightNow) {
+          if (isNightNow && state !== "sleep") enter("sleep");
+          else if (!isNightNow && state === "sleep") enter("sit");
+        },
+        clamp() {
+          sprite.x = Math.min(Math.max(sprite.x, bounds.min), bounds.max);
+          place(sprite);
+        },
+      };
+    }
+
+    // Hides in the tent, peeks out, sometimes wanders a little way and comes back.
+    function createTentCat(el: HTMLElement, home: HTMLElement): Actor {
+      const SPEED = 30;
+      const sprite: Sprite = { el, x: bounds.min, facing: 1 };
+      let state: TentState = "inside";
+      let timer = 0;
+      let target = 0;
+
+      const look = (value: TentLook) => {
+        home.dataset.look = value;
+      };
+      const jiggle = () => {
+        if (reduceMotion) return;
+        home.removeAttribute("data-jiggle");
+        void home.offsetWidth;
+        home.setAttribute("data-jiggle", "");
+      };
+
+      const enter = (next: TentState) => {
+        state = next;
+        switch (next) {
+          case "inside":
+            look("eyes");
+            setPose(sprite, "away");
+            timer = between([5000, 11000]);
+            break;
+          case "peek":
+            look("peek");
+            setPose(sprite, "away");
+            timer = between([2000, 4500]);
+            jiggle();
+            break;
+          case "out":
+            look("empty");
+            sprite.x = bounds.min;
+            sprite.facing = 1;
+            target = Math.min(bounds.max, bounds.min + between([40, 110]));
+            setPose(sprite, "walk");
+            jiggle();
+            break;
+          case "lounge":
+            setPose(sprite, "sit");
+            timer = between([3000, 7000]);
+            break;
+          case "home":
+            sprite.facing = -1;
+            setPose(sprite, "walk");
+            break;
+          case "sleep":
+            look("sleep");
+            setPose(sprite, "away");
+            timer = Infinity;
+            break;
+          default: {
+            const unhandled: never = next;
+            throw new Error(`Unknown tent state: ${unhandled}`);
+          }
+        }
+      };
+
+      const tick = (dt: number) => {
+        switch (state) {
+          case "inside":
+          case "peek":
+          case "lounge":
+            timer -= dt;
+            if (timer > 0) break;
+            if (state === "inside") enter("peek");
+            else if (state === "peek") enter(Math.random() < 0.5 ? "inside" : "out");
+            else enter("home");
+            break;
+          case "out":
+            sprite.x += SPEED * (dt / 1000);
+            if (sprite.x >= target) {
+              sprite.x = target;
+              enter("lounge");
+            }
+            break;
+          case "home":
+            sprite.x -= SPEED * (dt / 1000);
+            if (sprite.x <= bounds.min) {
+              sprite.x = bounds.min;
+              enter("inside");
+              jiggle();
+            }
+            break;
+          case "sleep":
+            break;
+          default: {
+            const unhandled: never = state;
+            throw new Error(`Unknown tent state: ${unhandled}`);
+          }
+        }
+        place(sprite);
+      };
+
+      enter(night ? "sleep" : reduceMotion ? "peek" : "inside");
+      place(sprite);
+
+      return {
+        tick,
+        setNight(isNightNow) {
+          if (isNightNow && state !== "sleep") enter("sleep");
+          else if (!isNightNow && state === "sleep") enter("inside");
+        },
+        clamp() {
+          sprite.x = Math.min(Math.max(sprite.x, bounds.min), bounds.max);
+          place(sprite);
+        },
+      };
+    }
+
+    measure();
+    const [fluffy, shorthair] = roamers;
+    const actors: Actor[] = [createTentCat(tentCat, tent)];
+    if (fluffy) actors.push(createRoamer(fluffy, { speed: 24, walkMs: [3000, 6500], sitMs: [4000, 9000], start: 0.62, entrance: false }));
+    if (shorthair) actors.push(createRoamer(shorthair, { speed: 34, walkMs: [3500, 8000], sitMs: [2500, 6000], start: 0.3, entrance: true }));
+
+    let frame = 0;
+    let last = 0;
+    const loop = (time: number) => {
+      const dt = Math.min(time - last, MAX_FRAME_MS);
+      last = time;
+      for (const actor of actors) actor.tick(dt);
+      frame = requestAnimationFrame(loop);
+    };
+    const start = () => {
+      if (reduceMotion || frame) return;
+      last = performance.now();
+      frame = requestAnimationFrame(loop);
+    };
+    const stop = () => {
+      cancelAnimationFrame(frame);
+      frame = 0;
+    };
+
+    window.addEventListener(SKY_DIAL_EVENT, (event) => {
+      night = isNight((event as CustomEvent<SkyDialChange>).detail.minutes);
+      for (const actor of actors) actor.setNight(night);
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      layer.toggleAttribute("data-paused", document.hidden);
+      for (const el of layer.querySelectorAll(".cat")) el.toggleAttribute("data-paused", document.hidden);
+      if (document.hidden) stop();
+      else start();
+    });
+
+    addEventListener("resize", () => {
+      measure();
+      for (const actor of actors) actor.clamp();
+    });
+
+    start();
+  }
+</script>
+
+<style is:global>
+  /* Pixel palette shared by the cat sprites and the tent */
+  .px-outline { fill: var(--cat-outline); }
+  .px-fur-light { fill: var(--cat-fur-light); }
+  .px-fur { fill: var(--cat-fur); }
+  .px-fur-dark { fill: var(--cat-fur-dark); }
+  .px-stripe { fill: var(--cat-stripe); }
+  .px-cream { fill: var(--cat-cream); }
+  .px-cream-shade { fill: var(--cat-cream-shade); }
+  .px-eye { fill: var(--cat-eye); }
+  .px-shine { fill: var(--cat-shine); }
+  .px-nose { fill: var(--cat-nose); }
+  .px-ear { fill: var(--cat-ear); }
+  .px-blush { fill: var(--cat-blush); }
+  .px-zzz { fill: var(--cat-zzz); }
+  .px-tent-fabric { fill: var(--tent-fabric); }
+  .px-tent-shade { fill: var(--tent-shade); }
+  .px-tent-stripe { fill: var(--tent-stripe); }
+  .px-tent-door { fill: var(--tent-door); }
+  .px-tent-flag { fill: var(--tent-flag); }
+  .px-tent-eye { fill: var(--tent-eye); }
+</style>
+
+<style>
+  .cat-layer {
+    position: fixed;
+    left: 0;
+    bottom: env(safe-area-inset-bottom);
+    z-index: 35;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .tent {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: var(--cat-size);
+    aspect-ratio: 32 / 24;
+    transform: translateX(var(--space-2));
+  }
+
+  .tent svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    transform-origin: 50% 100%;
+  }
+
+  .tent-eyes,
+  .tent-peek,
+  .tent-zzz {
+    opacity: 0;
+  }
+
+  .tent[data-look="eyes"] .tent-eyes {
+    opacity: 1;
+    animation: tent-blink 3.8s step-end infinite;
+  }
+
+  .tent[data-look="peek"] .tent-peek {
+    opacity: 1;
+  }
+
+  .tent[data-look="sleep"] .tent-zzz {
+    animation: tent-z 2.8s steps(5, end) infinite;
+  }
+
+  .tent[data-look="sleep"] .tent-zzz-small {
+    animation-delay: -1.4s;
+  }
+
+  .tent[data-jiggle] svg {
+    animation: tent-jiggle 0.36s steps(3, end);
+  }
+
+  @keyframes tent-blink {
+    0% { opacity: 1; }
+    90% { opacity: 0; }
+    94% { opacity: 1; }
+  }
+
+  @keyframes tent-z {
+    0% {
+      opacity: 0;
+      transform: translate(0, 2px);
+    }
+    20% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(2px, -5px);
+    }
+  }
+
+  @keyframes tent-jiggle {
+    33% { transform: rotate(-3deg); }
+    66% { transform: rotate(3deg); }
+  }
+
+  .cat-layer[data-paused] .tent * {
+    animation-play-state: paused !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tent * {
+      animation: none !important;
+    }
+
+    .tent[data-look="sleep"] .tent-zzz:not(.tent-zzz-small) {
+      opacity: 1;
+    }
+  }
+</style>

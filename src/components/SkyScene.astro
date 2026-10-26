@@ -1,0 +1,466 @@
+---
+import { NIGHT_END_HOUR, NIGHT_START_HOUR, SKY_STORAGE_KEY } from "../lib/skyTime";
+
+// Deterministic star field so every build renders the same sky.
+let seed = 7;
+const random = () => {
+  seed = (seed * 16807) % 2147483647;
+  return seed / 2147483647;
+};
+const starLayer = (count: number) =>
+  Array.from({ length: count }, () => ({
+    x: Math.round(random() * 1600),
+    y: Math.round(random() * 500),
+    r: (0.8 + random() * 1.8).toFixed(1),
+  }));
+const starsA = starLayer(42);
+const starsB = starLayer(42);
+
+const clouds = [
+  { y: "8%", w: "clamp(9rem, 20vw, 18rem)", dur: "190s", delay: "-40s", opacity: 0.95 },
+  { y: "18%", w: "clamp(6rem, 13vw, 12rem)", dur: "240s", delay: "-150s", opacity: 0.8 },
+  { y: "4%", w: "clamp(5rem, 10vw, 9rem)", dur: "280s", delay: "-90s", opacity: 0.7 },
+  { y: "27%", w: "clamp(8rem, 16vw, 15rem)", dur: "210s", delay: "-10s", opacity: 0.85 },
+];
+
+const fireflies = [
+  { x: "8%", y: "70%", dur: "5.2s", delay: "-1s" },
+  { x: "19%", y: "40%", dur: "6.4s", delay: "-3s" },
+  { x: "33%", y: "78%", dur: "4.8s", delay: "-2s" },
+  { x: "47%", y: "55%", dur: "7s", delay: "-4s" },
+  { x: "61%", y: "82%", dur: "5.6s", delay: "-0.5s" },
+  { x: "74%", y: "48%", dur: "6.1s", delay: "-2.5s" },
+  { x: "86%", y: "72%", dur: "5s", delay: "-3.5s" },
+  { x: "94%", y: "38%", dur: "6.8s", delay: "-1.5s" },
+];
+---
+
+<script
+  is:inline
+  define:vars={{ storageKey: SKY_STORAGE_KEY, nightStart: NIGHT_START_HOUR * 60, nightEnd: NIGHT_END_HOUR * 60 }}
+>
+  // Runs before the page paints so the light/dark theme never flashes.
+  let minutes = null;
+  try {
+    const raw = localStorage.getItem(storageKey);
+    if (raw !== null && Number.isFinite(Number(raw))) minutes = ((Number(raw) % 1440) + 1440) % 1440;
+  } catch {
+    // Storage blocked: fall back to the visitor's clock.
+  }
+  if (minutes === null) {
+    const now = new Date();
+    minutes = now.getHours() * 60 + now.getMinutes();
+  }
+  const root = document.documentElement;
+  root.dataset.skyMinutes = String(minutes);
+  root.dataset.skyTheme = minutes >= nightStart || minutes < nightEnd ? "dark" : "light";
+  root.setAttribute("data-sky-scene", "");
+</script>
+
+<div class="sky-scene" data-sky-scene-root aria-hidden="true">
+  <svg class="stars stars-a" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
+    {starsA.map((s) => <circle cx={s.x} cy={s.y} r={s.r} />)}
+  </svg>
+  <svg class="stars stars-b" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
+    {starsB.map((s) => <circle cx={s.x} cy={s.y} r={s.r} />)}
+  </svg>
+
+  <div class="clouds">
+    {clouds.map((c) => (
+      <svg
+        class="cloud"
+        viewBox="0 0 180 80"
+        style={`--y: ${c.y}; --w: ${c.w}; --dur: ${c.dur}; --delay: ${c.delay}; --o: ${c.opacity}`}
+      >
+        <path class="cloud-body" d="M30 70C10 70 6 48 24 44C22 26 44 18 58 28C66 10 98 8 108 28C122 18 146 26 146 44C166 44 170 70 150 70Z" />
+        <path class="cloud-shade" d="M24 66C40 74 140 74 156 66C150 72 34 74 24 66Z" />
+      </svg>
+    ))}
+  </div>
+
+  <svg class="landscape" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
+    <defs>
+      <radialGradient id="sky-sun-halo">
+        <stop offset="0" class="stop-glow" stop-opacity="0.75" />
+        <stop offset="1" class="stop-glow" stop-opacity="0" />
+      </radialGradient>
+      <radialGradient id="sky-moon-halo">
+        <stop offset="0" class="stop-glow" stop-opacity="0.4" />
+        <stop offset="1" class="stop-glow" stop-opacity="0" />
+      </radialGradient>
+      <radialGradient id="sky-horizon-glow" cy="1">
+        <stop offset="0" class="stop-glow" stop-opacity="0.9" />
+        <stop offset="1" class="stop-glow" stop-opacity="0" />
+      </radialGradient>
+      <linearGradient id="sky-mist-band" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" class="stop-mist" stop-opacity="0" />
+        <stop offset="0.6" class="stop-mist" stop-opacity="0.75" />
+        <stop offset="1" class="stop-mist" stop-opacity="0" />
+      </linearGradient>
+      <mask id="sky-moon-mask" maskUnits="userSpaceOnUse" x="-40" y="-40" width="80" height="80">
+        <rect x="-40" y="-40" width="80" height="80" fill="white" />
+        <circle cx="15" cy="-10" r="30" fill="black" />
+      </mask>
+    </defs>
+
+    <ellipse class="horizon-glow" cx="800" cy="620" rx="950" ry="300" fill="url(#sky-horizon-glow)" />
+
+    <g class="body" data-sun>
+      <circle r="160" fill="url(#sky-sun-halo)" />
+      <circle class="sun-core" r="44" />
+    </g>
+    <g class="body" data-moon>
+      <circle r="130" fill="url(#sky-moon-halo)" />
+      <circle class="moon-core" r="34" mask="url(#sky-moon-mask)" />
+    </g>
+
+    <!-- Far range: karst pillars and peaks -->
+    <path
+      class="far"
+      d="M0 640L0 520C60 500 90 430 120 420C150 415 160 470 190 480L230 300C238 270 262 270 270 300L300 470C340 450 380 380 430 360C470 345 500 400 540 420L580 250C590 215 620 215 628 250L660 430C700 410 760 330 820 320C880 312 920 380 960 400L1000 280C1010 248 1036 248 1044 280L1080 420C1130 400 1190 340 1250 345C1310 350 1340 420 1380 430L1410 330C1418 305 1440 305 1446 330L1470 440C1510 430 1560 470 1600 480L1600 640Z"
+    />
+
+    <!-- Floating island with a lone tree and a thin waterfall -->
+    <g class="island">
+      <path class="far" d="M790 238C820 226 900 224 940 236L924 252C904 300 880 330 866 352C852 326 828 292 806 254Z" />
+      <rect class="waterfall" x="902" y="248" width="3" height="70" />
+      <rect class="far" x="832" y="206" width="5" height="26" />
+      <circle class="far" cx="834" cy="200" r="16" />
+      <circle class="far" cx="846" cy="210" r="11" />
+    </g>
+
+    <rect class="mist" x="0" y="470" width="1600" height="190" fill="url(#sky-mist-band)" />
+
+    <!-- Mid hills with a small village -->
+    <path class="hill" d="M0 720L0 600C120 560 220 540 340 560C460 580 520 620 640 610C760 600 840 540 980 545C1120 550 1200 610 1320 600C1440 590 1520 560 1600 565L1600 720Z" />
+    <g class="village">
+      <rect x="930" y="522" width="34" height="32" />
+      <path d="M924 524L947 502L970 524Z" />
+      <rect x="985" y="505" width="30" height="48" />
+      <path d="M975 510L1000 492L1025 510Z" />
+      <rect x="990" y="486" width="20" height="8" />
+      <path d="M979 489L1000 472L1021 489Z" />
+      <rect x="999" y="460" width="2" height="14" />
+      <rect x="1036" y="524" width="40" height="30" />
+      <path d="M1030 526L1056 506L1082 526Z" />
+    </g>
+    <g class="windows">
+      <rect x="941" y="532" width="8" height="8" />
+      <rect x="995" y="520" width="10" height="10" />
+      <rect x="1044" y="533" width="7" height="7" />
+      <rect x="1060" y="533" width="7" height="7" />
+    </g>
+
+    <!-- Near meadow, a winding path and two trees -->
+    <path class="near" d="M0 900L0 700C200 660 380 650 560 680C740 710 900 720 1080 690C1260 660 1420 650 1600 670L1600 900Z" />
+    <path class="trail" d="M720 900C760 830 860 780 1000 712" />
+    <g class="near">
+      <rect x="250" y="600" width="14" height="90" />
+      <circle cx="257" cy="588" r="48" />
+      <circle cx="222" cy="612" r="34" />
+      <circle cx="294" cy="612" r="36" />
+      <rect x="1396" y="612" width="10" height="60" />
+      <circle cx="1401" cy="602" r="32" />
+      <circle cx="1380" cy="620" r="22" />
+      <circle cx="1424" cy="620" r="24" />
+    </g>
+  </svg>
+
+  <div class="fireflies">
+    {fireflies.map((f) => <span style={`--x: ${f.x}; --y: ${f.y}; --dur: ${f.dur}; --delay: ${f.delay}`} />)}
+  </div>
+</div>
+
+<script>
+  import {
+    MOON_RISE_HOUR,
+    MOON_SET_HOUR,
+    SKY_KEYFRAMES,
+    SKY_PARTS,
+    SUN_RISE_HOUR,
+    SUN_SET_HOUR,
+    arcProgress,
+    horizonGlow,
+    nightAmount,
+    paletteAt,
+    parseHex,
+    toCss,
+    type SkyPalette,
+  } from "../lib/skyPalette";
+  import { SKY_DIAL_EVENT, isNight, type SkyDialChange } from "../lib/skyTime";
+
+  const VIEW_WIDTH = 1600;
+  const VIEW_HEIGHT = 900;
+  const HORIZON_Y = 610;
+
+  const scene = document.querySelector<HTMLElement>("[data-sky-scene-root]");
+  const sun = scene?.querySelector<SVGGElement>("[data-sun]");
+  const moon = scene?.querySelector<SVGGElement>("[data-moon]");
+
+  if (scene && sun && moon) {
+    const root = document.documentElement;
+    const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+    const tokens = getComputedStyle(root);
+    const palettes: SkyPalette[] = SKY_KEYFRAMES.map((key) => {
+      const palette = {} as SkyPalette;
+      for (const part of SKY_PARTS) palette[part] = parseHex(tokens.getPropertyValue(`--sky-${key.name}-${part}`));
+      return palette;
+    });
+
+    // Visible slice of the 1600x900 artwork (preserveAspectRatio="xMidYMax slice").
+    let view = { x: 0, y: 0, width: VIEW_WIDTH, height: VIEW_HEIGHT };
+    const measure = () => {
+      const scale = Math.max(innerWidth / VIEW_WIDTH, innerHeight / VIEW_HEIGHT);
+      const width = innerWidth / scale;
+      const height = innerHeight / scale;
+      view = { x: (VIEW_WIDTH - width) / 2, y: VIEW_HEIGHT - height, width, height };
+    };
+
+    const place = (body: SVGGElement, progress: number | null) => {
+      if (progress === null) {
+        body.style.opacity = "0";
+        return;
+      }
+      const lift = Math.sin(progress * Math.PI);
+      const top = view.y + view.height * 0.16;
+      const x = view.x + view.width * (0.1 + progress * 0.8);
+      const y = HORIZON_Y - lift * (HORIZON_Y - top);
+      body.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
+      body.style.opacity = String(Math.min(1, lift * 4));
+    };
+
+    let current = Number(root.dataset.skyMinutes) || 0;
+
+    const apply = (minutes: number, animate: boolean) => {
+      current = minutes;
+      scene.toggleAttribute("data-animate", animate && !reduceMotion.matches);
+      const palette = paletteAt(minutes, palettes);
+      for (const part of SKY_PARTS) scene.style.setProperty(`--sky-${part}`, toCss(palette[part]));
+      const night = nightAmount(minutes);
+      scene.style.setProperty("--sky-stars", night.toFixed(3));
+      scene.style.setProperty("--sky-lights", Math.min(1, night * 1.4).toFixed(3));
+      scene.style.setProperty("--sky-horizon", horizonGlow(minutes).toFixed(3));
+      place(sun, arcProgress(minutes, SUN_RISE_HOUR, SUN_SET_HOUR));
+      place(moon, arcProgress(minutes, MOON_RISE_HOUR, MOON_SET_HOUR));
+      root.dataset.skyTheme = isNight(minutes) ? "dark" : "light";
+    };
+
+    // Coalesce rapid drag updates into one paint per frame.
+    let queued: SkyDialChange | null = null;
+    window.addEventListener(SKY_DIAL_EVENT, (event) => {
+      const first = queued === null;
+      queued = (event as CustomEvent<SkyDialChange>).detail;
+      if (!first) return;
+      requestAnimationFrame(() => {
+        if (queued) apply(queued.minutes, queued.animate);
+        queued = null;
+      });
+    });
+
+    addEventListener("resize", () => {
+      measure();
+      apply(current, false);
+    });
+
+    measure();
+    apply(current, false);
+    requestAnimationFrame(() => scene.setAttribute("data-ready", ""));
+  }
+</script>
+
+<style>
+  .sky-scene {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 58%, var(--sky-bottom) 100%);
+    opacity: 0;
+    transition: opacity var(--duration-slow) var(--ease-out);
+  }
+
+  .sky-scene[data-ready] {
+    opacity: 1;
+  }
+
+  .sky-scene[data-animate] {
+    transition:
+      opacity var(--duration-slow) var(--ease-out),
+      --sky-top var(--sky-transition) var(--ease-out),
+      --sky-mid var(--sky-transition) var(--ease-out),
+      --sky-bottom var(--sky-transition) var(--ease-out),
+      --sky-far var(--sky-transition) var(--ease-out),
+      --sky-hill var(--sky-transition) var(--ease-out),
+      --sky-near var(--sky-transition) var(--ease-out),
+      --sky-cloud var(--sky-transition) var(--ease-out),
+      --sky-glow var(--sky-transition) var(--ease-out),
+      --sky-mist var(--sky-transition) var(--ease-out),
+      --sky-stars var(--sky-transition) var(--ease-out),
+      --sky-lights var(--sky-transition) var(--ease-out),
+      --sky-horizon var(--sky-transition) var(--ease-out);
+  }
+
+  .sky-scene[data-animate] .body {
+    transition:
+      transform var(--sky-transition) var(--ease-out),
+      opacity var(--sky-transition) var(--ease-out);
+  }
+
+  .stars,
+  .landscape {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .stars {
+    fill: var(--sky-star);
+    opacity: var(--sky-stars);
+  }
+
+  .stars-a {
+    animation: twinkle-a 4.5s ease-in-out infinite alternate;
+  }
+
+  .stars-b {
+    animation: twinkle-b 3.7s ease-in-out infinite alternate;
+  }
+
+  @keyframes twinkle-a {
+    to {
+      opacity: calc(var(--sky-stars) * 0.45);
+    }
+  }
+
+  @keyframes twinkle-b {
+    from {
+      opacity: calc(var(--sky-stars) * 0.5);
+    }
+  }
+
+  .cloud {
+    position: absolute;
+    top: var(--y);
+    left: 0;
+    width: var(--w);
+    height: auto;
+    opacity: var(--o);
+    will-change: transform;
+    animation: cloud-drift var(--dur) linear var(--delay) infinite;
+  }
+
+  .cloud-body {
+    fill: var(--sky-cloud);
+  }
+
+  .cloud-shade {
+    fill: var(--sky-mist);
+  }
+
+  @keyframes cloud-drift {
+    from {
+      transform: translate3d(-30vw, 0, 0);
+    }
+    to {
+      transform: translate3d(110vw, 0, 0);
+    }
+  }
+
+  .horizon-glow {
+    opacity: var(--sky-horizon);
+  }
+
+  .stop-glow {
+    stop-color: var(--sky-glow);
+  }
+
+  .stop-mist {
+    stop-color: var(--sky-mist);
+  }
+
+  .sun-core {
+    fill: var(--sky-sun-core);
+  }
+
+  .moon-core {
+    fill: var(--sky-moon-core);
+  }
+
+  .far {
+    fill: var(--sky-far);
+  }
+
+  .island {
+    opacity: 0.9;
+  }
+
+  .waterfall {
+    fill: var(--sky-mist);
+    opacity: 0.8;
+  }
+
+  .hill {
+    fill: var(--sky-hill);
+  }
+
+  .village {
+    fill: var(--sky-near);
+  }
+
+  .windows {
+    fill: var(--sky-window);
+    opacity: var(--sky-lights);
+  }
+
+  .near {
+    fill: var(--sky-near);
+  }
+
+  .trail {
+    fill: none;
+    stroke: var(--sky-mist);
+    stroke-width: 12;
+    stroke-linecap: round;
+    opacity: 0.45;
+  }
+
+  .fireflies {
+    position: absolute;
+    inset: auto 0 0;
+    height: 28%;
+    opacity: var(--sky-lights);
+  }
+
+  .fireflies span {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--sky-window) 0 35%, transparent 70%);
+    will-change: transform, opacity;
+    animation: firefly var(--dur) ease-in-out var(--delay) infinite alternate;
+  }
+
+  @keyframes firefly {
+    from {
+      transform: translate3d(0, 0, 0) scale(0.8);
+      opacity: 0.2;
+    }
+    to {
+      transform: translate3d(14px, -22px, 0) scale(1.4);
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sky-scene,
+    .sky-scene * {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+</style>

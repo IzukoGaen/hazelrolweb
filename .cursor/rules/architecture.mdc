@@ -58,3 +58,11 @@ Use the UI UX Pro Max skill for design-system decisions.
 - Anything in the Cloudflare dashboard, and deploying or configuring the auth Worker.
 - Secrets: never write client secrets, tokens, or keys into any file in this repo.
   If a step needs one, stop and tell me where it should be configured.
+
+## Feature specs
+- Every feature has a spec in `docs/specs/`. Before implementing a feature, read
+  its spec AND `docs/specs/00-roadmap.md`.
+- Follow the spec's PROCESS steps in order and stop for review after each one.
+- When a step is approved, tick its checkbox in `00-roadmap.md`.
+- If a spec conflicts with these rules or with the existing template, stop and
+  tell me instead of guessing.

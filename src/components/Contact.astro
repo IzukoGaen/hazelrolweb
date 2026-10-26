@@ -4,16 +4,33 @@ import type { SectionProps } from "../lib/sections";
 
 type Props = SectionProps;
 
-const { contact } = Astro.props.profile;
+const { profile } = Astro.props;
+const { contact } = profile;
+const initial = profile.name.trim().charAt(0).toUpperCase();
 ---
 
 <section class="contact" id="contact" aria-labelledby="contact-title">
   <div class="container frame">
     <div class="contact-inner">
       <h2 class="contact-title reveal" id="contact-title" set:html={emphasis(contact.heading)} />
-      <a class="button pressable" href={`mailto:${contact.email}`}>
+      <a class="button pressable" href={`mailto:${contact.email}`} data-seal-trigger>
         {contact.email} <span aria-hidden="true">→</span>
       </a>
+      <div class="seal-row" data-seal>
+        <svg class="letter" viewBox="0 0 96 64" aria-hidden="true">
+          <rect class="letter-paper" x="2" y="2" width="92" height="60" rx="4" />
+          <path class="letter-fold" d="M2 6L48 38L94 6" />
+          <g class="seal">
+            <path
+              class="seal-wax"
+              d="M48 22C53 21 55 25 59 26C63 27 66 31 65 35C64 39 66 43 62 46C58 49 55 52 50 51C45 50 42 53 38 50C34 47 31 44 32 40C33 36 30 32 34 29C38 26 43 23 48 22Z"
+            />
+            <circle class="seal-ring" cx="48" cy="37" r="10" />
+            <text class="seal-initial" x="48" y="41.5" text-anchor="middle">{initial}</text>
+          </g>
+        </svg>
+        <p class="seal-status" role="status" data-seal-status data-message={contact.sealMessage}></p>
+      </div>
       <ul class="links">
         {contact.socials.map((social) => (
           <li>
@@ -33,6 +50,42 @@ const { contact } = Astro.props.profile;
     </div>
   </div>
 </section>
+
+<script>
+  const STAMP_MS = 650;
+  const RESET_MS = 6000;
+
+  const trigger = document.querySelector<HTMLAnchorElement>("[data-seal-trigger]");
+  const row = document.querySelector<HTMLElement>("[data-seal]");
+  const status = document.querySelector<HTMLElement>("[data-seal-status]");
+
+  if (trigger && row && status) {
+    const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+    let resetTimer = 0;
+
+    trigger.addEventListener("click", (event) => {
+      // Let new-tab and other modified clicks behave like a normal link.
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+
+      row.classList.remove("is-sealed");
+      void row.offsetWidth;
+      row.classList.add("is-sealed");
+      status.textContent = status.dataset.message ?? "";
+      if ("vibrate" in navigator) navigator.vibrate(10);
+
+      window.setTimeout(() => {
+        window.location.href = trigger.href;
+      }, reduceMotion.matches ? 150 : STAMP_MS);
+
+      window.clearTimeout(resetTimer);
+      resetTimer = window.setTimeout(() => {
+        row.classList.remove("is-sealed");
+        status.textContent = "";
+      }, RESET_MS);
+    });
+  }
+</script>
 
 <style>
   .contact-inner {
@@ -65,6 +118,97 @@ const { contact } = Astro.props.profile;
     --press-offset: 6px;
   }
 
+  /* Reserved space so the letter appears without shifting the layout */
+  .seal-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: 4rem;
+    margin-block: calc(-1 * var(--space-2));
+  }
+
+  .letter {
+    width: 4.5rem;
+    overflow: visible;
+    opacity: 0;
+    transform: translateY(10px) rotate(-4deg);
+    transition:
+      opacity var(--duration-fast) var(--ease-out),
+      transform var(--duration-base) var(--ease-spring);
+  }
+
+  .letter-paper {
+    fill: var(--letter-paper);
+    stroke: var(--outline);
+    stroke-width: 2.5;
+  }
+
+  .letter-fold {
+    fill: none;
+    stroke: var(--outline);
+    stroke-width: 2;
+    stroke-linejoin: round;
+  }
+
+  .seal {
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .seal-wax {
+    fill: var(--seal-wax);
+    stroke: var(--seal-wax-deep);
+    stroke-width: 1.5;
+  }
+
+  .seal-ring {
+    fill: none;
+    stroke: var(--seal-wax-deep);
+    stroke-width: 1.5;
+  }
+
+  .seal-initial {
+    fill: var(--seal-emboss);
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 13px;
+  }
+
+  .seal-status {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .is-sealed .letter {
+    opacity: 1;
+    transform: translateY(0) rotate(-4deg);
+  }
+
+  .is-sealed .seal {
+    animation: stamp 520ms var(--ease-out) 160ms both;
+  }
+
+  @keyframes stamp {
+    0% {
+      opacity: 0;
+      transform: scale(2.4) rotate(-24deg);
+    }
+    55% {
+      opacity: 1;
+      transform: scale(0.86) rotate(-6deg);
+    }
+    78% {
+      transform: scale(1.07) rotate(-9deg);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) rotate(-8deg);
+    }
+  }
+
   .links {
     display: flex;
     flex-wrap: wrap;
@@ -72,5 +216,13 @@ const { contact } = Astro.props.profile;
     gap: var(--space-3);
     font-size: var(--text-sm);
     font-weight: 500;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .is-sealed .seal {
+      animation: none;
+      opacity: 1;
+      transform: rotate(-8deg);
+    }
   }
 </style>

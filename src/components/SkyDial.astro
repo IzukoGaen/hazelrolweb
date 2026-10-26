@@ -27,9 +27,17 @@ const { color, labels } = Astro.props;
 </div>
 
 <script>
-  import { DEGREES_PER_MINUTE, formatClock, periodAt, wrapMinutes, type SkyPeriod } from "../lib/skyTime";
+  import {
+    DEGREES_PER_MINUTE,
+    SKY_DIAL_EVENT,
+    SKY_STORAGE_KEY,
+    formatClock,
+    periodAt,
+    wrapMinutes,
+    type SkyDialChange,
+    type SkyPeriod,
+  } from "../lib/skyTime";
 
-  const STORAGE_KEY = "hazel:sky-dial-minutes";
   const DRAG_THRESHOLD_PX = 4;
 
   type Labels = Record<SkyPeriod, string>;
@@ -66,7 +74,7 @@ const { color, labels } = Astro.props;
 
     const readStored = (): number | null => {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
+        const raw = localStorage.getItem(SKY_STORAGE_KEY);
         if (raw === null) return null;
         const value = Number(raw);
         return Number.isFinite(value) ? wrapMinutes(value) : null;
@@ -77,26 +85,27 @@ const { color, labels } = Astro.props;
 
     const persist = () => {
       try {
-        localStorage.setItem(STORAGE_KEY, String(Math.round(minutes)));
+        localStorage.setItem(SKY_STORAGE_KEY, String(Math.round(minutes)));
       } catch {
         // Storage can be unavailable (private mode, blocked cookies); the dial still works.
       }
     };
 
-    const render = () => {
+    const render = (animate: boolean) => {
       const text = `${labelFor(periodAt(minutes))}, ${formatClock(minutes)}`;
       face.style.setProperty("--dial-angle", `${angle}deg`);
       control.setAttribute("aria-valuenow", String(Math.floor(minutes)));
       control.setAttribute("aria-valuetext", text);
       readout.textContent = text;
-      window.dispatchEvent(new CustomEvent("skydial:change", { detail: { minutes } }));
+      window.dispatchEvent(new CustomEvent<SkyDialChange>(SKY_DIAL_EVENT, { detail: { minutes, animate } }));
     };
 
     const shift = (deltaMinutes: number, animate: boolean) => {
-      root.toggleAttribute("data-animate", animate && !reduceMotion.matches);
+      const animated = animate && !reduceMotion.matches;
+      root.toggleAttribute("data-animate", animated);
       minutes = wrapMinutes(minutes + deltaMinutes);
       angle += deltaMinutes * DEGREES_PER_MINUTE;
-      render();
+      render(animated);
     };
 
     const stepToHour = (direction: 1 | -1) => {
@@ -192,7 +201,7 @@ const { color, labels } = Astro.props;
     const now = new Date();
     minutes = readStored() ?? now.getHours() * 60 + now.getMinutes();
     angle = minutes * DEGREES_PER_MINUTE;
-    render();
+    render(false);
     root.setAttribute("data-ready", "");
   }
 </script>

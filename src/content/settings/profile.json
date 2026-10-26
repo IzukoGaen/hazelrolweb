@@ -70,7 +70,8 @@
       { "label": "LinkedIn", "url": "https://www.linkedin.com/" },
       { "label": "Instagram", "url": "https://www.instagram.com/" }
     ],
-    "cvLabel": "CV (PDF)"
+    "cvLabel": "CV (PDF)",
+    "sealMessage": "¡Carta sellada! Abriendo tu correo…"
   },
   "footer": {
     "note": "Hecho con cariño en SLP",
