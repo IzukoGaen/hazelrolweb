@@ -33,8 +33,18 @@ collections:
             label: Buscadores (SEO)
             widget: object
             fields:
-              - { name: title, label: Título de la pestaña, widget: string }
-              - { name: description, label: Descripción, widget: text }
+              - { name: title, label: Título en Google y en la pestaña, widget: string, hint: "Empieza con tu nombre. Ideal: menos de 60 caracteres." }
+              - { name: description, label: Descripción en Google, widget: text, hint: "Incluye tu nombre, qué estudias y dónde. Ideal: 120 a 160 caracteres." }
+              - { name: siteName, label: Nombre del sitio, widget: string, hint: "Cómo quieres que Google nombre el sitio, ej. Hazel Rol." }
+              - { name: alternateNames, label: Otros nombres del sitio, widget: list, hint: "Formas en que la gente podría buscarte, ej. Hazel Rol Web." }
+              - { name: jobTitle, label: Profesión o puesto, widget: string }
+              - { name: university, label: Universidad, widget: string }
+              - { name: city, label: Ciudad, widget: string }
+              - { name: country, label: País, widget: string }
+              - { name: locale, label: "Idioma y región (ej. es_MX)", widget: string }
+              - { name: shareImage, label: "Imagen al compartir el enlace (1200×630 ideal)", widget: image, required: false, hint: "Si la dejas vacía se usa tu retrato." }
+              - { name: shareImageAlt, label: Descripción de la imagen al compartir, widget: string, required: false }
+              - { name: googleVerification, label: Código de verificación de Google Search Console, widget: string, required: false, hint: "Solo el valor de content del meta tag que te da Google." }
           - name: nav
             label: Menú
             widget: object

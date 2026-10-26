@@ -22,6 +22,16 @@ const profile = defineCollection({
       seo: z.object({
         title: z.string(),
         description: z.string(),
+        siteName: z.string(),
+        alternateNames: z.array(z.string()),
+        jobTitle: z.string(),
+        university: z.string(),
+        city: z.string(),
+        country: z.string(),
+        locale: z.string(),
+        shareImage: image().optional(),
+        shareImageAlt: z.string().optional(),
+        googleVerification: z.string().optional(),
       }),
       nav: z.object({
         work: z.string(),

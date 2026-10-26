@@ -2,8 +2,15 @@
   "name": "Hazel Rol",
   "language": "es",
   "seo": {
-    "title": "Hazel Rol — Portafolio de Mercadotecnia",
-    "description": "Estudiante de la Licenciatura en Mercadotecnia Estratégica en la UASLP. Estrategia de marca, redes sociales e investigación de mercados."
+    "title": "Hazel Rol | Portafolio de Mercadotecnia Estratégica",
+    "description": "Hazel Rol, estudiante de Mercadotecnia Estratégica en la UASLP, San Luis Potosí. Portafolio de estrategia de marca, redes sociales e investigación de mercados.",
+    "siteName": "Hazel Rol",
+    "alternateNames": ["Hazel Rol Web", "Hazel Rol Portafolio", "hazelrolweb"],
+    "jobTitle": "Estudiante de Mercadotecnia Estratégica",
+    "university": "Universidad Autónoma de San Luis Potosí",
+    "city": "San Luis Potosí",
+    "country": "MX",
+    "locale": "es_MX"
   },
   "nav": {
     "work": "Proyectos",
